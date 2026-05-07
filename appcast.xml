@@ -6,6 +6,17 @@
     <description>StorageBar update feed</description>
     <language>en</language>
     <!-- Releases vão aqui em ordem cronológica decrescente. release.sh adiciona automaticamente. -->
+    <item>
+        <title>Version 1.1</title>
+        <pubDate>Thu, 07 May 2026 14:37:00 +0000</pubDate>
+        <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.1/StorageBar.zip"
+                   sparkle:version="5"
+                   sparkle:shortVersionString="1.1"
+                   length="8726738"
+                   type="application/octet-stream"
+                   sparkle:edSignature="iNWUGESd1+16bFjN19tSth14Om8Yd5+jkuEAOf30JiJxxY+dA/L2lCB0adWhFYhTsPWCQe8pfHtpqBlcxx4gCQ==" />
+        <description><![CDATA[Quick Clean feature, new popover UI, Sparkle auto-updates]]></description>
+    </item>
     <!--
     Exemplo de entry:
     <item>

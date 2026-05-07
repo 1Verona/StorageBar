@@ -5,6 +5,8 @@
 
 set -e
 
+export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+
 VERSION="${1:-}"
 NOTES="${2:-}"
 TEAM_ID="9SZ8SL4LH5"
@@ -79,6 +81,25 @@ if [ ! -d "$BUILD_DIR/StorageBar.app" ]; then
     exit 1
 fi
 log "Build successful ✓"
+
+# --- 2.5. Re-sign Sparkle framework binaries ---
+log "Re-signing Sparkle framework binaries..."
+SPARKLE_FRAMEWORK="$BUILD_DIR/StorageBar.app/Contents/Frameworks/Sparkle.framework"
+if [ -d "$SPARKLE_FRAMEWORK" ]; then
+    # Sign all binaries inside Sparkle.framework
+    find "$SPARKLE_FRAMEWORK" -type f \( -name "*.dylib" -o -name "*.so" -o -perm +111 \) ! -name "*.plist" ! -name "*.strings" ! -name "*.nib" ! -name "*.css" -exec codesign --force --sign "Developer ID Application: Aether Tech LTDA. ($TEAM_ID)" --timestamp --options runtime {} \; 2>/dev/null || true
+    # Sign Updater.app specifically
+    if [ -d "$SPARKLE_FRAMEWORK/Versions/B/Updater.app" ]; then
+        codesign --force --sign "Developer ID Application: Aether Tech LTDA. ($TEAM_ID)" --timestamp --options runtime "$SPARKLE_FRAMEWORK/Versions/B/Updater.app" 2>/dev/null || true
+    fi
+    # Sign Autoupdate
+    if [ -f "$SPARKLE_FRAMEWORK/Versions/B/Autoupdate" ]; then
+        codesign --force --sign "Developer ID Application: Aether Tech LTDA. ($TEAM_ID)" --timestamp --options runtime "$SPARKLE_FRAMEWORK/Versions/B/Autoupdate" 2>/dev/null || true
+    fi
+    # Re-sign the framework itself
+    codesign --force --sign "Developer ID Application: Aether Tech LTDA. ($TEAM_ID)" --timestamp --options runtime "$SPARKLE_FRAMEWORK" 2>/dev/null || true
+    log "Sparkle re-signed ✓"
+fi
 
 # --- 3. Verify signature ---
 log "Verifying code signature..."
