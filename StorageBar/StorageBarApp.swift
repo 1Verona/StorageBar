@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 import Combine
 import ServiceManagement
+import Sparkle
 
 // MARK: - Constantes do Gumroad (TROCAR antes de publicar)
 
@@ -41,6 +42,7 @@ enum L {
             "menu.details": "Details",
             "menu.settings": "Settings…",
             "menu.quit": "Quit",
+            "menu.checkUpdates": "Check for Updates…",
             "menu.usageFormat": "%@ of %@ used (%d%%)",
             "menu.lockedDetail": "Trial expired — please activate",
             "menu.activated": "Activated ✓",
@@ -61,6 +63,7 @@ enum L {
             "settings.weight": "Weight",
             "settings.language": "Language",
             "settings.percentSize": "Size",
+            "settings.pillWidth": "Pill width",
             "settings.percentPosition": "Position",
             "settings.percentContent": "Show",
             "settings.openOnLogin": "Open at login",
@@ -99,12 +102,32 @@ enum L {
             "weight.bold": "Bold",
             "weight.heavy": "Heavy",
             "time.lessThanMinute": "less than 1min",
+            "settings.section.quickClean": "Quick Clean",
+            "clean.scan": "Scan",
+            "clean.scanning": "Scanning…",
+            "clean.cleanSelected": "Clean Selected",
+            "clean.cleaning": "Cleaning…",
+            "clean.totalSelected": "Total selected: %@",
+            "clean.cleaned": "Cleaned: %@",
+            "clean.emptyTrash": "Empty Trash",
+            "clean.userCaches": "User Caches",
+            "clean.logFiles": "Log Files",
+            "clean.oldDownloads": "Old Downloads (>30d)",
+            "clean.screenshots": "Screenshots",
+            "clean.xcodeDerivedData": "Xcode Derived Data",
+            "clean.browserCaches": "Browser Caches",
+            "clean.iosBackups": "iOS Backups",
+            "clean.iosBackupWarning": "This will delete all iPhone/iPad backups stored locally. Continue?",
+            "clean.dmgFiles": "DMG Installers",
+            "menu.quickClean": "Quick Clean",
+            "menu.cleanNow": "Clean Selected",
         ],
         .es: [
             "menu.loading": "Cargando…",
             "menu.details": "Detalles",
             "menu.settings": "Ajustes…",
             "menu.quit": "Salir",
+            "menu.checkUpdates": "Buscar actualizaciones…",
             "menu.usageFormat": "%@ de %@ usados (%d%%)",
             "menu.lockedDetail": "Prueba expirada — activa para continuar",
             "menu.activated": "Activado ✓",
@@ -125,6 +148,7 @@ enum L {
             "settings.weight": "Grosor",
             "settings.language": "Idioma",
             "settings.percentSize": "Tamaño",
+            "settings.pillWidth": "Ancho de la píldora",
             "settings.percentPosition": "Posición",
             "settings.percentContent": "Mostrar",
             "settings.openOnLogin": "Abrir al iniciar sesión",
@@ -163,12 +187,32 @@ enum L {
             "weight.bold": "Negrita",
             "weight.heavy": "Extra-negrita",
             "time.lessThanMinute": "menos de 1min",
+            "settings.section.quickClean": "Limpieza rápida",
+            "clean.scan": "Escanear",
+            "clean.scanning": "Escaneando…",
+            "clean.cleanSelected": "Limpiar seleccionados",
+            "clean.cleaning": "Limpiando…",
+            "clean.totalSelected": "Total seleccionado: %@",
+            "clean.cleaned": "Limpiado: %@",
+            "clean.emptyTrash": "Vaciar papelera",
+            "clean.userCaches": "Cachés de usuario",
+            "clean.logFiles": "Archivos de registro",
+            "clean.oldDownloads": "Descargas antiguas (>30d)",
+            "clean.screenshots": "Capturas de pantalla",
+            "clean.xcodeDerivedData": "Datos derivados de Xcode",
+            "clean.browserCaches": "Cachés del navegador",
+            "clean.iosBackups": "Copias de iOS",
+            "clean.iosBackupWarning": "Esto eliminará todas las copias de iPhone/iPad almacenadas localmente. ¿Continuar?",
+            "clean.dmgFiles": "Instaladores DMG",
+            "menu.quickClean": "Limpieza rápida",
+            "menu.cleanNow": "Limpiar seleccionados",
         ],
         .pt: [
             "menu.loading": "Carregando…",
             "menu.details": "Detalhes",
             "menu.settings": "Ajustes…",
             "menu.quit": "Sair",
+            "menu.checkUpdates": "Verificar atualizações…",
             "menu.usageFormat": "%@ de %@ usados (%d%%)",
             "menu.lockedDetail": "Trial expirado — ative para continuar",
             "menu.activated": "Ativação ✓",
@@ -189,6 +233,7 @@ enum L {
             "settings.weight": "Espessura",
             "settings.language": "Idioma",
             "settings.percentSize": "Tamanho",
+            "settings.pillWidth": "Largura da pílula",
             "settings.percentPosition": "Posição",
             "settings.percentContent": "Mostrar",
             "settings.openOnLogin": "Abrir ao fazer login",
@@ -227,6 +272,25 @@ enum L {
             "weight.bold": "Negrito",
             "weight.heavy": "Extra-negrito",
             "time.lessThanMinute": "menos de 1min",
+            "settings.section.quickClean": "Limpeza rápida",
+            "clean.scan": "Escanear",
+            "clean.scanning": "Escaneando…",
+            "clean.cleanSelected": "Limpar selecionados",
+            "clean.cleaning": "Limpando…",
+            "clean.totalSelected": "Total selecionado: %@",
+            "clean.cleaned": "Limpo: %@",
+            "clean.emptyTrash": "Esvaziar lixeira",
+            "clean.userCaches": "Caches do usuário",
+            "clean.logFiles": "Arquivos de log",
+            "clean.oldDownloads": "Downloads antigos (>30d)",
+            "clean.screenshots": "Capturas de tela",
+            "clean.xcodeDerivedData": "Dados derivados do Xcode",
+            "clean.browserCaches": "Caches do navegador",
+            "clean.iosBackups": "Backups de iOS",
+            "clean.iosBackupWarning": "Isso excluirá todos os backups de iPhone/iPad armazenados localmente. Continuar?",
+            "clean.dmgFiles": "Instaladores DMG",
+            "menu.quickClean": "Limpeza rápida",
+            "menu.cleanNow": "Limpar selecionados",
         ],
     ]
 }
@@ -268,7 +332,11 @@ struct SettingsView: View {
     @AppStorage("percentSize") private var percentSize: Double = 0.7
     @AppStorage("percentPosition") private var percentPositionRaw: String = PercentPosition.insideFilled.rawValue
     @AppStorage("percentContent") private var percentContentRaw: String = PercentContent.percent.rawValue
+    @AppStorage("pillWidthFactor") private var pillWidthFactor: Double = 1.0
     @AppStorage("openOnLogin") private var openOnLogin: Bool = true
+
+    @StateObject private var cleaner = StorageCleaner()
+    @State private var showIOSBackupAlert = false
 
     private var languageBinding: Binding<Language> {
         Binding(
@@ -348,6 +416,7 @@ struct SettingsView: View {
                         percentSize: percentSize,
                         percentPosition: PercentPosition(rawValue: percentPositionRaw) ?? .insideFilled,
                         percentContent: PercentContent(rawValue: percentContentRaw) ?? .percent,
+                        pillWidthFactor: pillWidthFactor,
                         fraction: 0.62
                     )
                     .frame(width: 220, height: 80)
@@ -412,6 +481,12 @@ struct SettingsView: View {
                 HStack {
                     Text(L.t("settings.percentSize"))
                     Slider(value: $percentSize, in: 0.4...0.95)
+                        .frame(maxWidth: 200)
+                }
+                HStack {
+                    Text(L.t("settings.pillWidth"))
+                    Slider(value: $pillWidthFactor, in: 0.3...1.0)
+                        .frame(maxWidth: 200)
                 }
             }
 
@@ -426,12 +501,305 @@ struct SettingsView: View {
             Section(L.t("settings.section.system")) {
                 Toggle(L.t("settings.openOnLogin"), isOn: $openOnLogin)
             }
+
+            Section {
+                HStack(spacing: 8) {
+                    Button {
+                        Task { await cleaner.scanAll() }
+                    } label: {
+                        Label(
+                            cleaner.isScanning ? L.t("clean.scanning") : L.t("clean.scan"),
+                            systemImage: cleaner.isScanning ? "arrow.triangle.2.circlepath" : "magnifyingglass"
+                        )
+                    }
+                    .disabled(cleaner.isScanning || cleaner.isCleaning)
+
+                    Button {
+                        let hasIOS = cleaner.categories.first(where: { $0.category == .iosBackups })?.selected ?? false
+                        if hasIOS {
+                            showIOSBackupAlert = true
+                        } else {
+                            Task { await cleaner.cleanSelected() }
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: cleaner.isCleaning ? "arrow.triangle.2.circlepath" : "broom")
+                                .font(.system(size: 13))
+                            Text(cleaner.isCleaning ? L.t("clean.cleaning") : L.t("clean.cleanSelected"))
+                                .font(.system(size: 13, weight: .medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(cleaner.isScanning || cleaner.isCleaning || cleaner.totalSelectedBytes == 0)
+
+                    Spacer()
+
+                    if cleaner.showCleanResult {
+                        Text(String(format: L.t("clean.cleaned"), ByteCountFormatter.string(fromByteCount: cleaner.cleanedBytes, countStyle: .file)))
+                            .foregroundStyle(.green)
+                            .font(.caption)
+                    }
+                }
+
+                ForEach($cleaner.categories) { $cat in
+                    HStack {
+                        Toggle(L.t("clean.\(cat.category.rawValue)"), isOn: $cat.selected)
+                            .onChange(of: cat.selected) { _, _ in
+                                cleaner.toggleSelection(cat.category)
+                            }
+                        Spacer()
+                        if cat.scanning {
+                            ProgressView().controlSize(.small)
+                        } else if cat.sizeBytes > 0 {
+                            Text(ByteCountFormatter.string(fromByteCount: cat.sizeBytes, countStyle: .file))
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                        }
+                    }
+                }
+
+                if cleaner.totalSelectedBytes > 0 {
+                    Text(String(format: L.t("clean.totalSelected"), ByteCountFormatter.string(fromByteCount: cleaner.totalSelectedBytes, countStyle: .file)))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text(L.t("settings.section.quickClean"))
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 760)
+        .frame(width: 520, height: 1000)
+        .alert(L.t("clean.iosBackups"), isPresented: $showIOSBackupAlert) {
+            Button(L.t("clean.cleanSelected"), role: .destructive) {
+                Task { await cleaner.cleanSelected() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(L.t("clean.iosBackupWarning"))
+        }
         .onChange(of: openOnLogin) { _, newValue in
             LoginItemManager.setEnabled(newValue)
         }
+    }
+}
+
+// MARK: - MenuBarPopoverView
+
+struct MenuBarPopoverView: View {
+    @ObservedObject var cleaner: StorageCleaner
+    let onSettings: () -> Void
+    let onDetails: () -> Void
+    let onActivate: () -> Void
+    let onCheckUpdates: () -> Void
+    let onQuit: () -> Void
+
+    private var appVersion: String {
+        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let b = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "v\(v) (\(b))"
+    }
+
+    @State private var usage: DiskUsage?
+    @State private var showCleanConfirm = false
+    @State private var isCleaning = false
+    @State private var cleanedBytes: Int64 = 0
+    @State private var showCleanResult = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("StorageBar")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+                Text(appVersion)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.35))
+                Spacer()
+                Button {
+                    Task {
+                        usage = DiskUsage.current()
+                    }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 4)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+
+            if let usage = usage {
+                StorageRingView(fraction: usage.fraction, size: 120)
+                    .padding(.top, 4)
+                    .padding(.bottom, 8)
+
+                let used = ByteCountFormatter.string(fromByteCount: usage.usedBytes, countStyle: .file)
+                let total = ByteCountFormatter.string(fromByteCount: usage.totalBytes, countStyle: .file)
+
+                Text("\(used) / \(total)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .padding(.bottom, 12)
+            } else {
+                ProgressView()
+                    .padding(20)
+            }
+
+            Divider()
+                .background(Color.white.opacity(0.1))
+                .padding(.horizontal, 16)
+
+            Button {
+                showCleanConfirm = true
+            } label: {
+                HStack {
+                    Image(systemName: "broom")
+                        .font(.system(size: 13))
+                    Text(L.t("menu.quickClean"))
+                        .font(.system(size: 13, weight: .medium))
+                    Spacer()
+                    if isCleaning {
+                        ProgressView().controlSize(.small)
+                    } else if showCleanResult {
+                        Text(ByteCountFormatter.string(fromByteCount: cleanedBytes, countStyle: .file))
+                            .font(.system(size: 11))
+                            .foregroundStyle(.green)
+                    }
+                }
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+            }
+            .buttonStyle(.plain)
+            .background(Color.white.opacity(0.05))
+            .cornerRadius(8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .disabled(isCleaning)
+            .scaleEffect(1.0)
+            .animation(.easeInOut(duration: 0.15), value: isCleaning)
+            .confirmationDialog(L.t("menu.quickClean"), isPresented: $showCleanConfirm) {
+                Button(L.t("clean.cleanSelected"), role: .destructive) {
+                    runClean()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                let total = ByteCountFormatter.string(fromByteCount: cleaner.totalSelectedBytes, countStyle: .file)
+                Text("This will clean selected categories (~\(total)).")
+            }
+
+            Divider()
+                .background(Color.white.opacity(0.1))
+                .padding(.horizontal, 16)
+
+            MenuRow(icon: "info.circle", label: L.t("menu.details"), action: onDetails)
+            MenuRow(icon: "gear", label: L.t("menu.settings"), action: onSettings)
+            MenuRow(icon: LicenseManager.shared.isActivated ? "checkmark.seal.fill" : "lock.fill",
+                    label: LicenseManager.shared.isActivated ? L.t("menu.activated") : L.t("menu.activate"),
+                    action: onActivate)
+            MenuRow(icon: "arrow.triangle.2.circlepath", label: L.t("menu.checkUpdates"), action: onCheckUpdates)
+
+            Divider()
+                .background(Color.white.opacity(0.1))
+                .padding(.horizontal, 16)
+
+            MenuRow(icon: "xmark.circle", label: L.t("menu.quit"), action: onQuit)
+                .padding(.bottom, 8)
+        }
+        .frame(width: 260)
+        .background(Color(.black).opacity(0.85))
+        .cornerRadius(12)
+        .onAppear {
+            usage = DiskUsage.current()
+        }
+        .onChange(of: cleaner.cleanedBytes) { _, newVal in
+            if newVal > 0 {
+                cleanedBytes = newVal
+                showCleanResult = true
+            }
+        }
+    }
+
+    private func runClean() {
+        isCleaning = true
+        showCleanResult = false
+        Task {
+            await cleaner.cleanSelected()
+            isCleaning = false
+            usage = DiskUsage.current()
+        }
+    }
+}
+
+struct MenuRow: View {
+    let icon: String
+    let label: String
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            HStack {
+                Image(systemName: icon)
+                    .font(.system(size: 13))
+                    .frame(width: 20)
+                    .foregroundStyle(.white.opacity(0.5))
+                Text(label)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.8))
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct StorageRingView: View {
+    let fraction: Double
+    let size: CGFloat
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.08), lineWidth: size * 0.12)
+                .frame(width: size, height: size)
+
+            Circle()
+                .trim(from: 0, to: CGFloat(fraction))
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.95, green: 0.35, blue: 0.3),
+                            Color(red: 0.7, green: 0.3, blue: 0.65),
+                            Color(red: 0.5, green: 0.3, blue: 0.9)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: size * 0.12, lineCap: .round)
+                )
+                .frame(width: size, height: size)
+                .rotationEffect(.degrees(-90))
+
+            VStack(spacing: 4) {
+                Text("\(Int((fraction * 100).rounded()))%")
+                    .font(.system(size: size * 0.28, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text("Used")
+                    .font(.system(size: size * 0.1, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.45))
+            }
+        }
+        .padding(.bottom, 8)
     }
 }
 
@@ -447,6 +815,7 @@ struct StorageBarPreview: NSViewRepresentable {
     let percentSize: Double
     let percentPosition: PercentPosition
     let percentContent: PercentContent
+    let pillWidthFactor: Double
     let fraction: Double
 
     func makeNSView(context: Context) -> StorageBarView {
@@ -463,6 +832,7 @@ struct StorageBarPreview: NSViewRepresentable {
         view.percentSize = percentSize
         view.percentPosition = percentPosition
         view.percentContent = percentContent
+        view.pillWidthFactor = pillWidthFactor
         // valores fictícios pro preview de "GB used/free"
         view.usedBytes = 120 * 1_000_000_000
         view.freeBytes = 80 * 1_000_000_000
@@ -696,11 +1066,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem!
     private var barView: StorageBarView!
-    private var detailItem: NSMenuItem!
-    private var activationItem: NSMenuItem!
+    private var activationItem: NSMenuItem?
     private var timer: Timer?
     private var settingsWindow: NSWindow?
     private var activationWindow: NSWindow?
+    private var cleaner = StorageCleaner()
+    private var popover: NSPopover?
+    private var popoverHosting: NSHostingController<MenuBarPopoverView>?
+    private let updaterController: SPUStandardUpdaterController
+
+    override init() {
+        updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+        super.init()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: 60)
@@ -719,13 +1101,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             view.percentSize = loadPercentSize()
             view.percentPosition = loadPercentPosition()
             view.percentContent = loadPercentContent()
+            view.pillWidthFactor = loadPillWidthFactor()
             view.locked = !LicenseManager.shared.isLicensed
             button.addSubview(view)
             barView = view
+
+            button.action = #selector(togglePopover)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
-        statusItem.menu = buildMenu()
+        let hosting = NSHostingController(rootView: MenuBarPopoverView(
+            cleaner: cleaner,
+            onSettings: { [weak self] in self?.openSettingsWindow() },
+            onDetails: { [weak self] in self?.openStorageSettings() },
+            onActivate: { [weak self] in self?.openActivationWindow() },
+            onCheckUpdates: { [weak self] in self?.checkForUpdates() },
+            onQuit: { NSApplication.shared.terminate(nil) }
+        ))
+        popoverHosting = hosting
+
+        let pop = NSPopover()
+        pop.contentViewController = hosting
+        pop.behavior = .transient
+        pop.animates = true
+        popover = pop
+
         refresh()
+        Task {
+            await cleaner.scanAll()
+        }
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refresh() }
         }
@@ -758,6 +1162,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc private func togglePopover() {
+        if let pop = popover, pop.isShown {
+            pop.performClose(nil)
+        } else {
+            refreshPopover()
+            if let button = statusItem.button {
+                popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            }
+        }
+    }
+
+    private func refreshPopover() {
+        popoverHosting?.rootView = MenuBarPopoverView(
+            cleaner: cleaner,
+            onSettings: { [weak self] in
+                self?.popover?.performClose(nil)
+                self?.openSettingsWindow()
+            },
+            onDetails: { [weak self] in
+                self?.popover?.performClose(nil)
+                self?.openStorageSettings()
+            },
+            onActivate: { [weak self] in
+                self?.popover?.performClose(nil)
+                self?.openActivationWindow()
+            },
+            onCheckUpdates: { [weak self] in
+                self?.popover?.performClose(nil)
+                self?.checkForUpdates()
+            },
+            onQuit: { NSApplication.shared.terminate(nil) }
+        )
+    }
+
     @objc private func userDefaultsChanged() {
         let newStyle = loadSavedStyle()
         if barView.style != newStyle { barView.style = newStyle }
@@ -769,11 +1207,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         barView.percentSize = loadPercentSize()
         barView.percentPosition = loadPercentPosition()
         barView.percentContent = loadPercentContent()
+        barView.pillWidthFactor = loadPillWidthFactor()
         let nowLocked = !LicenseManager.shared.isLicensed
         if barView.locked != nowLocked { barView.locked = nowLocked }
-        // rebuilda o menu pra refletir mudanças de idioma
-        statusItem.menu = buildMenu()
         refresh()
+        if popover?.isShown == true { refreshPopover() }
         // títulos de janelas
         settingsWindow?.title = L.t("settings.title")
         activationWindow?.title = L.t("activation.title")
@@ -782,59 +1220,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func closeActivationWindowNotif() {
         activationWindow?.close()
         barView.locked = !LicenseManager.shared.isLicensed
-        updateActivationMenuItem()
-    }
-
-    private func buildMenu() -> NSMenu {
-        let menu = NSMenu()
-
-        detailItem = NSMenuItem(title: L.t("menu.loading"), action: nil, keyEquivalent: "")
-        detailItem.isEnabled = false
-        menu.addItem(detailItem)
-        menu.addItem(.separator())
-
-        let detailsItem = NSMenuItem(
-            title: L.t("menu.details"),
-            action: #selector(openStorageSettings),
-            keyEquivalent: ""
-        )
-        detailsItem.target = self
-        menu.addItem(detailsItem)
-
-        let prefsItem = NSMenuItem(
-            title: L.t("menu.settings"),
-            action: #selector(openSettingsWindow),
-            keyEquivalent: ","
-        )
-        prefsItem.target = self
-        menu.addItem(prefsItem)
-
-        activationItem = NSMenuItem(
-            title: activationItemTitle(),
-            action: #selector(openActivationWindowAction),
-            keyEquivalent: ""
-        )
-        activationItem.target = self
-        menu.addItem(activationItem)
-
-        menu.addItem(.separator())
-        menu.addItem(NSMenuItem(
-            title: L.t("menu.quit"),
-            action: #selector(NSApplication.terminate(_:)),
-            keyEquivalent: "q"
-        ))
-        return menu
-    }
-
-    private func activationItemTitle() -> String {
-        let m = LicenseManager.shared
-        if m.isActivated { return L.t("menu.activated") }
-        if m.trialExpired { return L.t("menu.activate") }
-        return String(format: L.t("menu.trial"), m.remainingTimeText)
-    }
-
-    private func updateActivationMenuItem() {
-        activationItem?.title = activationItemTitle()
     }
 
     @objc private func openStorageSettings() {
@@ -863,6 +1248,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func openActivationWindowAction() { openActivationWindow() }
+
+    @objc private func checkForUpdates() {
+        updaterController.checkForUpdates(nil)
+    }
 
     private func openActivationWindow() {
         if activationWindow == nil {
@@ -941,24 +1330,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return PercentContent(rawValue: raw) ?? .percent
     }
 
+    private func loadPillWidthFactor() -> Double {
+        let v = UserDefaults.standard.double(forKey: "pillWidthFactor")
+        return v == 0 ? 1.0 : v
+    }
+
     private func refresh() {
-        updateActivationMenuItem()
         let nowLocked = !LicenseManager.shared.isLicensed
         if barView.locked != nowLocked { barView.locked = nowLocked }
-
-        if nowLocked {
-            detailItem.title = L.t("menu.lockedDetail")
-            return
-        }
 
         guard let usage = DiskUsage.current() else { return }
         barView.fraction = usage.fraction
         barView.usedBytes = usage.usedBytes
         barView.freeBytes = usage.availableBytes
-        let used = ByteCountFormatter.string(fromByteCount: usage.usedBytes, countStyle: .file)
-        let total = ByteCountFormatter.string(fromByteCount: usage.totalBytes, countStyle: .file)
-        let pct = Int((usage.fraction * 100).rounded())
-        detailItem.title = String(format: L.t("menu.usageFormat"), used, total, pct)
+        if popover?.isShown == true { refreshPopover() }
     }
 }
 
@@ -988,16 +1373,16 @@ struct DiskUsage {
 // MARK: - BarStyle
 
 enum BarStyle: String, CaseIterable {
-    case outline, solid, track, pillWithPercent
-    case outlineColor, solidColor, trackColor, pillWithPercentColor
+    case outline, track, pillWithPercent
+    case outlineColor, trackColor, pillWithPercentColor
 
-    enum RenderKind { case outline, solid, track, pillWithPercent }
+    enum RenderKind { case outline, track, pillWithPercent }
 
     var displayName: String { L.t("style.\(rawValue)") }
 
     var fillColor: NSColor {
         switch self {
-        case .outlineColor, .solidColor, .trackColor, .pillWithPercentColor:
+        case .outlineColor, .trackColor, .pillWithPercentColor:
             return .controlAccentColor
         default:
             return .labelColor
@@ -1007,7 +1392,6 @@ enum BarStyle: String, CaseIterable {
     var renderKind: RenderKind {
         switch self {
         case .outline, .outlineColor:                 return .outline
-        case .solid, .solidColor:                     return .solid
         case .track, .trackColor:                     return .track
         case .pillWithPercent, .pillWithPercentColor: return .pillWithPercent
         }
@@ -1044,6 +1428,179 @@ enum PercentPosition: String, CaseIterable {
 enum PercentContent: String, CaseIterable {
     case percent, gbUsed, gbFree
     var displayName: String { L.t("content.\(rawValue)") }
+}
+
+// MARK: - StorageCleaner
+
+enum CleanCategory: String, CaseIterable, Identifiable {
+    case emptyTrash, userCaches, logFiles, oldDownloads, screenshots, xcodeDerivedData, browserCaches, iosBackups, dmgFiles
+    var id: String { rawValue }
+}
+
+@MainActor
+final class StorageCleaner: ObservableObject {
+    struct CategoryInfo: Identifiable {
+        let category: CleanCategory
+        var sizeBytes: Int64 = 0
+        var selected: Bool = true
+        var scanning: Bool = false
+        var id: String { category.rawValue }
+    }
+
+    @Published var categories: [CategoryInfo] = CleanCategory.allCases.map { CategoryInfo(category: $0) }
+    @Published var isScanning: Bool = false
+    @Published var isCleaning: Bool = false
+    @Published var cleanedBytes: Int64 = 0
+    @Published var showCleanResult: Bool = false
+
+    private let ud = UserDefaults.standard
+
+    init() {
+        for cat in CleanCategory.allCases {
+            let key = "cleanSelected_\(cat.rawValue)"
+            if ud.object(forKey: key) == nil {
+                ud.set(true, forKey: key)
+            }
+        }
+        loadSelections()
+    }
+
+    private func loadSelections() {
+        for i in categories.indices {
+            let key = "cleanSelected_\(categories[i].category.rawValue)"
+            categories[i].selected = ud.bool(forKey: key)
+        }
+    }
+
+    func toggleSelection(_ cat: CleanCategory) {
+        if let idx = categories.firstIndex(where: { $0.category == cat }) {
+            categories[idx].selected.toggle()
+            ud.set(categories[idx].selected, forKey: "cleanSelected_\(cat.rawValue)")
+        }
+    }
+
+    var totalSelectedBytes: Int64 {
+        categories.filter(\.selected).reduce(0) { $0 + $1.sizeBytes }
+    }
+
+    func scanAll() async {
+        isScanning = true
+        let cats = categories.map(\.category)
+        await withTaskGroup(of: (Int, Int64).self) { group in
+            for i in cats.indices {
+                let cat = cats[i]
+                group.addTask {
+                    let size = Self.scanSize(for: cat)
+                    return (i, size)
+                }
+            }
+            for await (idx, size) in group {
+                categories[idx].sizeBytes = size
+            }
+        }
+        isScanning = false
+    }
+
+    func cleanSelected() async {
+        isCleaning = true
+        cleanedBytes = 0
+        let selected = categories.filter(\.selected).map(\.category)
+        for cat in selected {
+            cleanedBytes += Self.cleanSize(for: cat)
+        }
+        showCleanResult = cleanedBytes > 0
+        isCleaning = false
+        await scanAll()
+    }
+
+    nonisolated static func scanSize(for cat: CleanCategory) -> Int64 {
+        let paths = targetPaths(for: cat)
+        return paths.reduce(0) { $0 + directorySize(at: $1) }
+    }
+
+    nonisolated static func cleanSize(for cat: CleanCategory) -> Int64 {
+        let paths = targetPaths(for: cat)
+        var total: Int64 = 0
+        for path in paths {
+            total += directorySize(at: path)
+            try? FileManager.default.removeItem(atPath: path)
+        }
+        return total
+    }
+
+    nonisolated static func targetPaths(for cat: CleanCategory) -> [String] {
+        let home = NSHomeDirectory()
+        switch cat {
+        case .emptyTrash:
+            return [home + "/.Trash"]
+        case .userCaches:
+            let cachesDir = home + "/Library/Caches"
+            guard let contents = try? FileManager.default.contentsOfDirectory(atPath: cachesDir) else { return [] }
+            return contents
+                .filter { $0 != "com.apple" && !$0.hasPrefix("com.apple.") }
+                .map { cachesDir + "/" + $0 }
+        case .logFiles:
+            return [home + "/Library/Logs"]
+        case .oldDownloads:
+            let dlDir = home + "/Downloads"
+            guard let contents = try? FileManager.default.contentsOfDirectory(atPath: dlDir) else { return [] }
+            let cutoff = Date().addingTimeInterval(-30 * 86400)
+            return contents.compactMap { name -> String? in
+                let fullPath = dlDir + "/" + name
+                if let fmAttrs = try? FileManager.default.attributesOfItem(atPath: fullPath),
+                   let modDate = fmAttrs[.modificationDate] as? Date,
+                   modDate < cutoff {
+                    return fullPath
+                }
+                return nil
+            }
+        case .screenshots:
+            let desktop = home + "/Desktop"
+            guard let contents = try? FileManager.default.contentsOfDirectory(atPath: desktop) else { return [] }
+            return contents
+                .filter { $0.hasPrefix("Screenshot") && ($0.hasSuffix(".png") || $0.hasSuffix(".jpg")) }
+                .map { desktop + "/" + $0 }
+        case .xcodeDerivedData:
+            return [home + "/Library/Developer/Xcode/DerivedData"]
+        case .browserCaches:
+            return [
+                home + "/Library/Caches/com.apple.Safari",
+                home + "/Library/Caches/com.apple.Safari.Search",
+                home + "/Library/Caches/com.apple.SafariTechnologyPreview",
+                home + "/Library/Caches/Google/Chrome",
+                home + "/Library/Caches/Google/Chrome/Default/Cache",
+                home + "/Library/Caches/Google/Chrome/Default/Media Cache",
+                home + "/Library/Caches/com.google.Chrome"
+            ]
+        case .iosBackups:
+            return [home + "/Library/Application Support/MobileSync/Backup"]
+        case .dmgFiles:
+            let dlDir = home + "/Downloads"
+            guard let contents = try? FileManager.default.contentsOfDirectory(atPath: dlDir) else { return [] }
+            return contents
+                .filter { $0.lowercased().hasSuffix(".dmg") }
+                .map { dlDir + "/" + $0 }
+        }
+    }
+
+    nonisolated static func directorySize(at path: String) -> Int64 {
+        guard let enumerator = FileManager.default.enumerator(atPath: path) else {
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: path),
+               let size = attrs[.size] as? NSNumber {
+                return size.int64Value
+            }
+            return 0
+        }
+        var total: Int64 = 0
+        while let file = enumerator.nextObject() as? String {
+            let fullPath = path + "/" + file
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: fullPath),
+               let size = attrs[.size] as? NSNumber {
+                total += size.int64Value
+            }
+        }
+        return total
+    }
 }
 
 // MARK: - Login Item
@@ -1094,6 +1651,7 @@ final class StorageBarView: NSView {
     var percentSize: Double = 0.7 { didSet { needsDisplay = true } }
     var percentPosition: PercentPosition = .insideFilled { didSet { needsDisplay = true } }
     var percentContent: PercentContent = .percent { didSet { needsDisplay = true } }
+    var pillWidthFactor: Double = 1.0 { didSet { needsDisplay = true } }
     var usedBytes: Int64 = 0 { didSet { needsDisplay = true } }
     var freeBytes: Int64 = 0 { didSet { needsDisplay = true } }
 
@@ -1117,23 +1675,25 @@ final class StorageBarView: NSView {
 
         switch style.renderKind {
         case .outline:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barRadius = barAreaRect.height / 2
+            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             border.setStroke()
-            shape.lineWidth = max(1, h / 22.0)
-            shape.stroke()
-            clipFill(shape: shape, rect: rect, fraction: f, color: tint)
-
-        case .solid:
-            guard f > 0 else { return }
-            let minW = rect.height
-            let w = max(minW, rect.width * f)
-            let fillRect = NSRect(x: rect.minX, y: rect.minY, width: w, height: rect.height)
-            tint.setFill()
-            NSBezierPath(roundedRect: fillRect, xRadius: radius, yRadius: radius).fill()
+            barShape.lineWidth = max(1, h / 22.0)
+            barShape.stroke()
+            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
 
         case .track:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barRadius = barAreaRect.height / 2
+            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             background.setFill()
-            shape.fill()
-            clipFill(shape: shape, rect: rect, fraction: f, color: tint)
+            barShape.fill()
+            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
 
         case .pillWithPercent:
             let text = labelText(fraction: Double(f))
@@ -1146,17 +1706,17 @@ final class StorageBarView: NSView {
             ]
             let textSize = (text as NSString).size(withAttributes: attrs)
 
-            let barAreaRect: NSRect
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+
             let textOriginX: CGFloat
             if outside {
                 let spacing = h * 0.15
-                let barWidth = max(rect.height, rect.width - textSize.width - spacing)
-                barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barWidth, height: rect.height)
                 textOriginX = barAreaRect.maxX + spacing
             } else {
-                barAreaRect = rect
-                let filledW = max(rect.height, rect.width * f)
-                textOriginX = rect.minX + filledW / 2 - textSize.width / 2
+                let filledW = max(barAreaRect.height, barAreaWidth * f)
+                textOriginX = barAreaRect.minX + filledW / 2 - textSize.width / 2
             }
 
             let barRadius = barAreaRect.height / 2

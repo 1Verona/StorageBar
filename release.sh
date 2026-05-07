@@ -1,0 +1,214 @@
+#!/bin/bash
+# release.sh — Build, sign, notarize, zip, update appcast, and push GitHub release
+# Usage: ./release.sh [version] [release_notes]
+# Example: ./release.sh 1.1 "Quick Clean feature, new popover UI, Sparkle auto-updates"
+
+set -e
+
+VERSION="${1:-}"
+NOTES="${2:-}"
+TEAM_ID="9SZ8SL4LH5"
+BUNDLE_ID="Aether.StorageBar"
+SCHEME="StorageBar"
+PROJECT="StorageBar.xcodeproj"
+BUILD_DIR="/tmp/storagebar-release"
+DIST_DIR="$(dirname "$0")/dist"
+APPCAST="$(dirname "$0")/appcast.xml"
+REPO="1Verona/StorageBar"
+APPCAST_URL="https://github.com/$REPO/releases/download/appcast/appcast.xml"
+NOTARY_PROFILE="StorageBarNotarize"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+log() { echo -e "${GREEN}[release]${NC} $1"; }
+warn() { echo -e "${YELLOW}[release]${NC} $1"; }
+err()  { echo -e "${RED}[release]${NC} $1"; }
+
+# --- Validate ---
+if [ -z "$VERSION" ]; then
+    err "Usage: $0 <version> [release_notes]"
+    err "Example: $0 1.1 \"Bug fixes and improvements\""
+    exit 1
+fi
+
+if ! command -v xcodebuild &>/dev/null; then
+    err "xcodebuild not found. Set DEVELOPER_DIR or install Xcode."
+    exit 1
+fi
+
+log "Releasing StorageBar v$VERSION"
+[ -n "$NOTES" ] && log "Notes: $NOTES"
+
+# --- 1. Update project version ---
+log "Updating version to $VERSION..."
+cd "$(dirname "$0")"
+
+# Update MARKETING_VERSION and CURRENT_PROJECT_VERSION in project.pbxproj
+sed -i '' "s/MARKETING_VERSION = [0-9.]*;/MARKETING_VERSION = $VERSION;/g" StorageBar.xcodeproj/project.pbxproj
+
+# Increment build number
+CURRENT_BUILD=$(grep -m1 "CURRENT_PROJECT_VERSION = " StorageBar.xcodeproj/project.pbxproj | grep -o "[0-9]*")
+NEW_BUILD=$((CURRENT_BUILD + 1))
+sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $NEW_BUILD;/g" StorageBar.xcodeproj/project.pbxproj
+log "Build number: $CURRENT_BUILD → $NEW_BUILD"
+
+# --- 2. Build Release with Developer ID ---
+log "Building Release with Developer ID signing..."
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
+
+xcodebuild -project "$PROJECT" \
+    -scheme "$SCHEME" \
+    -configuration Release \
+    -destination 'platform=macOS' \
+    build \
+    CODE_SIGN_IDENTITY="Developer ID Application: Aether Tech LTDA. ($TEAM_ID)" \
+    CODE_SIGN_STYLE=Manual \
+    DEVELOPMENT_TEAM="$TEAM_ID" \
+    CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+    OTHER_CODE_SIGN_FLAGS="--timestamp" \
+    CONFIGURATION_BUILD_DIR="$BUILD_DIR" \
+    -quiet
+
+if [ ! -d "$BUILD_DIR/StorageBar.app" ]; then
+    err "Build failed — StorageBar.app not found in $BUILD_DIR"
+    exit 1
+fi
+log "Build successful ✓"
+
+# --- 3. Verify signature ---
+log "Verifying code signature..."
+codesign -dv --verbose=4 "$BUILD_DIR/StorageBar.app" 2>&1 | grep -E "Authority|Timestamp" || true
+
+# --- 4. Create zip ---
+log "Creating zip archive..."
+cd "$BUILD_DIR"
+rm -f StorageBar.zip
+ditto -c -k --sequesterRsrc --keepParent StorageBar.app StorageBar.zip
+ZIP_SIZE=$(stat -f%z StorageBar.zip)
+log "Zip created: $(numfmt --to=iec-i --suffix=B $ZIP_SIZE 2>/dev/null || echo "${ZIP_SIZE} bytes")"
+
+# --- 5. Notarize ---
+log "Submitting for notarization..."
+xcrun notarytool submit StorageBar.zip --keychain-profile "$NOTARY_PROFILE" --wait
+
+# Check status
+SUBMISSION_ID=$(xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" | grep -A1 "StorageBar.zip" | grep "id:" | head -1 | awk '{print $2}')
+STATUS=$(xcrun notarytool info "$SUBMISSION_ID" --keychain-profile "$NOTARY_PROFILE" 2>/dev/null | grep "status:" | awk '{print $2}')
+
+if [ "$STATUS" != "Accepted" ]; then
+    err "Notarization failed with status: $STATUS"
+    log "Check details: xcrun notarytool log $SUBMISSION_ID --keychain-profile $NOTARY_PROFILE"
+    exit 1
+fi
+log "Notarization accepted ✓"
+
+# --- 6. Staple ---
+log "Stapling notarization ticket..."
+xcrun stapler staple "$BUILD_DIR/StorageBar.app"
+spctl -a -vv "$BUILD_DIR/StorageBar.app" 2>&1 | grep "accepted" && log "Staple verified ✓" || warn "Staple verification inconclusive"
+
+# --- 7. Copy to dist ---
+log "Copying to dist/..."
+cd "$(dirname "$0")"
+rm -rf "$DIST_DIR/StorageBar.app" "$DIST_DIR/StorageBar.zip"
+cp -R "$BUILD_DIR/StorageBar.app" "$DIST_DIR/"
+cp "$BUILD_DIR/StorageBar.zip" "$DIST_DIR/"
+
+# --- 8. Create DMG ---
+log "Creating DMG..."
+rm -f "$DIST_DIR/StorageBar.dmg"
+hdiutil create -volname "StorageBar" -srcfolder "$DIST_DIR/StorageBar.app" -ov -format UDZO "$DIST_DIR/StorageBar.dmg"
+
+# --- 9. Sign update for Sparkle ---
+log "Signing update for Sparkle..."
+PRIVATE_KEY_FILE="$(dirname "$0")/../.sparkle/private_key.txt"
+if [ -f "$PRIVATE_KEY_FILE" ]; then
+    PRIVATE_KEY=$(cat "$PRIVATE_KEY_FILE" | tr -d '[:space:]')
+    SPARKLE_SIG=$(swift -e "
+import Foundation
+import CryptoKit
+guard let keyData = Data(base64Encoded: \"$PRIVATE_KEY\") else { exit(1) }
+let privateKey = Curve25519.Signing.PrivateKey(rawRepresentation: keyData)
+guard let zipData = try? Data(contentsOf: URL(fileURLWithPath: \"$DIST_DIR/StorageBar.zip\")) else { exit(1) }
+let signature = try privateKey.signature(for: zipData)
+print(signature.rawRepresentation.base64EncodedString())
+" 2>/dev/null)
+    if [ -n "$SPARKLE_SIG" ]; then
+        log "Sparkle signature: $SPARKLE_SIG"
+    else
+        warn "Failed to generate Sparkle signature"
+        SPARKLE_SIG=""
+    fi
+else
+    warn "Private key not found at $PRIVATE_KEY_FILE"
+    warn "Updates will only verify via Developer ID signature"
+    SPARKLE_SIG=""
+fi
+
+# --- 10. Update appcast.xml ---
+log "Updating appcast.xml..."
+RELEASE_DATE=$(date -u +"%a, %d %b %Y %H:%M:%S +0000")
+ZIP_LEN=$(stat -f%z "$DIST_DIR/StorageBar.zip")
+
+# Download URL for the zip (GitHub release asset)
+DOWNLOAD_URL="https://github.com/$REPO/releases/download/v$VERSION/StorageBar.zip"
+
+# Build the new item XML
+NEW_ITEM="<item>
+    <title>Version $VERSION</title>
+    <pubDate>$RELEASE_DATE</pubDate>
+    <enclosure url=\"$DOWNLOAD_URL\"
+               sparkle:version=\"$NEW_BUILD\"
+               sparkle:shortVersionString=\"$VERSION\"
+               length=\"$ZIP_LEN\"
+               type=\"application/octet-stream\"
+               sparkle:edSignature=\"$SPARKLE_SIG\" />
+    <description><![CDATA[$NOTES]]></description>
+</item>"
+
+# Insert before </channel>
+sed -i '' "s|</channel>|${NEW_ITEM}
+</channel>|" "$APPCAST"
+
+log "appcast.xml updated ✓"
+
+# --- 11. Git commit ---
+log "Committing changes..."
+git add StorageBar.xcodeproj/project.pbxproj appcast.xml
+git commit -m "Release v$VERSION ($NEW_BUILD)
+
+$NOTES" || warn "No changes to commit or git not configured"
+
+# --- Summary ---
+echo ""
+log "========================================="
+log " Release v$VERSION ($NEW_BUILD) ready!"
+log "========================================="
+log ""
+log " Files in dist/:"
+log "   - StorageBar.app"
+log "   - StorageBar.zip  ($(numfmt --to=iec-i --suffix=B $ZIP_SIZE 2>/dev/null || echo "${ZIP_SIZE} bytes"))"
+log "   - StorageBar.dmg"
+log "   - appcast.xml (updated)"
+log ""
+warn " NEXT STEPS (manual):"
+warn " 1. If sign_update wasn't available, get the ed25519 signature:"
+warn "    brew install sparkle"
+warn "    sign_update dist/StorageBar.zip"
+warn "    Then update appcast.xml with the signature"
+warn ""
+warn " 2. Create GitHub release:"
+warn "    gh release create v$VERSION dist/StorageBar.zip dist/StorageBar.dmg --title \"v$VERSION\" --notes \"$NOTES\""
+warn ""
+warn " 3. Push appcast.xml to the 'appcast' release tag:"
+warn "    gh release create appcast appcast.xml --title \"Appcast Feed\" --notes \"Sparkle appcast feed\" --prerelease"
+warn "    (or upload appcast.xml to the existing appcast release)"
+warn ""
+warn " 4. Push git changes:"
+warn "    git push origin main"
+echo ""

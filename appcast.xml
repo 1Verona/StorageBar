@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="yes"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>StorageBar</title>
+    <link>https://github.com/1Verona/StorageBar</link>
+    <description>StorageBar update feed</description>
+    <language>en</language>
+    <!-- Releases vão aqui em ordem cronológica decrescente. release.sh adiciona automaticamente. -->
+    <!--
+    Exemplo de entry:
+    <item>
+        <title>Version 1.1</title>
+        <pubDate>Thu, 07 May 2026 00:00:00 +0000</pubDate>
+        <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.1/StorageBar.zip"
+                   sparkle:version="2"
+                   sparkle:shortVersionString="1.1"
+                   length="7411770"
+                   type="application/octet-stream"
+                   sparkle:edSignature="YOUR_ED25519_SIGNATURE_HERE" />
+        <description><![CDATA[Quick Clean feature, new popover UI, Sparkle auto-updates]]></description>
+    </item>
+    -->
+  </channel>
+</rss>
