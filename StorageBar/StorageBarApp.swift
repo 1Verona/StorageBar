@@ -426,7 +426,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L.t("settings.barStyle")).font(.subheadline).foregroundStyle(.secondary)
                     HStack(spacing: 6) {
-                        ForEach([BarStyle.solid, .outline, .track, .pill], id: \.self) { s in
+                        ForEach([BarStyle.solid, .outline, .track], id: \.self) { s in
                             Button {
                                 barStyleRaw = s.rawValue
                             } label: {
@@ -1410,9 +1410,9 @@ struct DiskUsage {
 // MARK: - BarStyle
 
 enum BarStyle: String, CaseIterable {
-    case solid, outline, track, pill, pillWithPercent, trackOutline, gradient, minimal
+    case solid, outline, track, pillWithPercent, trackOutline, gradient, minimal
 
-    enum RenderKind { case solid, outline, track, pill, pillWithPercent, trackOutline, gradient, minimal }
+    enum RenderKind { case solid, outline, track, pillWithPercent, trackOutline, gradient, minimal }
 
     var displayName: String { L.t("style.\(rawValue)") }
 
@@ -1428,7 +1428,6 @@ enum BarStyle: String, CaseIterable {
         case .solid:          return .solid
         case .outline:        return .outline
         case .track:          return .track
-        case .pill:           return .pill
         case .pillWithPercent: return .pillWithPercent
         case .trackOutline:   return .trackOutline
         case .gradient:       return .gradient
@@ -1734,16 +1733,6 @@ final class StorageBarView: NSView {
             clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
 
         case .track:
-            let barWidthFactor = pillWidthFactor
-            let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
-            let barRadius = barAreaRect.height / 2
-            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
-            background.setFill()
-            barShape.fill()
-            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
-
-        case .pill:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
             let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
