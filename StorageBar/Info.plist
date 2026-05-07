@@ -31,7 +31,7 @@
 	<key>SUPublicEDKey</key>
 	<string>XWperj6Z0QRF20RavqQYYWs27DQwF02SyBN8PgSt2r8=</string>
 	<key>SUFeedURL</key>
-	<string>https://github.com/1Verona/StorageBar/releases/download/appcast/appcast.xml</string>
+	<string>https://raw.githubusercontent.com/1Verona/StorageBar/main/appcast.xml</string>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
 </dict>
