@@ -84,14 +84,14 @@ enum L {
             "activation.removeActivation": "Remove activation",
             "activation.errorInvalid": "Invalid or already used key.",
             "activation.errorNetwork": "Network error: %@",
-            "style.outline": "Outline",
             "style.solid": "Solid",
-            "style.track": "Track + fill",
-            "style.pillWithPercent": "Pill with %",
-            "style.outlineColor": "Outline (color)",
-            "style.solidColor": "Solid (color)",
-            "style.trackColor": "Track + fill (color)",
-            "style.pillWithPercentColor": "Pill with % (color)",
+            "style.outline": "Outline",
+            "style.track": "Track",
+            "style.pill": "Pill",
+            "style.pillWithPercent": "Pill + %",
+            "style.trackOutline": "Track Outline",
+            "style.gradient": "Gradient",
+            "style.minimal": "Minimal",
             "font.system": "System",
             "font.rounded": "Rounded",
             "font.monospaced": "Monospaced",
@@ -169,14 +169,14 @@ enum L {
             "activation.removeActivation": "Eliminar activación",
             "activation.errorInvalid": "Key inválida o ya usada.",
             "activation.errorNetwork": "Error de red: %@",
-            "style.outline": "Contorno",
             "style.solid": "Sólido",
-            "style.track": "Barra + relleno",
-            "style.pillWithPercent": "Píldora con %",
-            "style.outlineColor": "Contorno (color)",
-            "style.solidColor": "Sólido (color)",
-            "style.trackColor": "Barra + relleno (color)",
-            "style.pillWithPercentColor": "Píldora con % (color)",
+            "style.outline": "Contorno",
+            "style.track": "Trilho",
+            "style.pill": "Pílula",
+            "style.pillWithPercent": "Pílula + %",
+            "style.trackOutline": "Trilho Contorno",
+            "style.gradient": "Gradiente",
+            "style.minimal": "Mínimo",
             "font.system": "Sistema",
             "font.rounded": "Redondeada",
             "font.monospaced": "Monoespaciada",
@@ -254,14 +254,14 @@ enum L {
             "activation.removeActivation": "Remover ativação",
             "activation.errorInvalid": "Key inválida ou já usada.",
             "activation.errorNetwork": "Erro de rede: %@",
-            "style.outline": "Contorno",
             "style.solid": "Sólida",
-            "style.track": "Trilho + preenchimento",
-            "style.pillWithPercent": "Pílula com %",
-            "style.outlineColor": "Contorno (cor)",
-            "style.solidColor": "Sólida (cor)",
-            "style.trackColor": "Trilho + preenchimento (cor)",
-            "style.pillWithPercentColor": "Pílula com % (cor)",
+            "style.outline": "Contorno",
+            "style.track": "Trilho",
+            "style.pill": "Pílula",
+            "style.pillWithPercent": "Pílula + %",
+            "style.trackOutline": "Trilho Contorno",
+            "style.gradient": "Gradiente",
+            "style.minimal": "Mínima",
             "font.system": "Sistema",
             "font.rounded": "Arredondada",
             "font.monospaced": "Monoespaçada",
@@ -310,22 +310,20 @@ struct StorageBarApp: App {
 
 struct SettingsView: View {
     @AppStorage("language") private var languageRaw: String = Language.en.rawValue
-    @AppStorage("barStyle") private var barStyleRaw: String = BarStyle.outline.rawValue
+    @AppStorage("barStyle") private var barStyleRaw: String = BarStyle.solid.rawValue
 
-    @AppStorage("useCustomTint") private var useCustomTint: Bool = false
-    @AppStorage("tintR") private var tintR: Double = 0.0
-    @AppStorage("tintG") private var tintG: Double = 0.478
-    @AppStorage("tintB") private var tintB: Double = 1.0
+    @AppStorage("useCustomTint") private var useCustomTint: Bool = true
+    @AppStorage("tintR") private var tintR: Double = 0.45
+    @AppStorage("tintG") private var tintG: Double = 0.75
+    @AppStorage("tintB") private var tintB: Double = 0.25
 
     @AppStorage("useCustomBorder") private var useCustomBorder: Bool = false
     @AppStorage("borderR") private var borderR: Double = 0.5
     @AppStorage("borderG") private var borderG: Double = 0.5
     @AppStorage("borderB") private var borderB: Double = 0.5
 
-    @AppStorage("useCustomBackground") private var useCustomBackground: Bool = false
-    @AppStorage("backgroundR") private var backgroundR: Double = 0.85
-    @AppStorage("backgroundG") private var backgroundG: Double = 0.85
-    @AppStorage("backgroundB") private var backgroundB: Double = 0.85
+    @AppStorage("selectedTintColor") private var selectedTintColor: String = "green"
+    @AppStorage("backgroundOpacity") private var backgroundOpacity: Double = 0.2
 
     @AppStorage("percentFont") private var percentFontRaw: String = PercentFont.system.rawValue
     @AppStorage("percentWeight") private var percentWeightRaw: String = PercentWeight.heavy.rawValue
@@ -346,7 +344,7 @@ struct SettingsView: View {
     }
     private var styleBinding: Binding<BarStyle> {
         Binding(
-            get: { BarStyle(rawValue: barStyleRaw) ?? .outline },
+            get: { BarStyle(rawValue: barStyleRaw) ?? .solid },
             set: { barStyleRaw = $0.rawValue }
         )
     }
@@ -395,11 +393,10 @@ struct SettingsView: View {
         useCustomBorder ? NSColor(srgbRed: borderR, green: borderG, blue: borderB, alpha: 1) : nil
     }
     private var previewBackground: NSColor? {
-        useCustomBackground ? NSColor(srgbRed: backgroundR, green: backgroundG, blue: backgroundB, alpha: 1) : nil
+        NSColor.labelColor.withAlphaComponent(backgroundOpacity)
     }
 
     var body: some View {
-        // referenciar languageRaw força re-render quando muda
         let _ = languageRaw
 
         Form {
@@ -407,7 +404,7 @@ struct SettingsView: View {
                 HStack {
                     Spacer()
                     StorageBarPreview(
-                        style: BarStyle(rawValue: barStyleRaw) ?? .outline,
+                        style: BarStyle(rawValue: barStyleRaw) ?? .solid,
                         customTint: previewTint,
                         customBorder: previewBorder,
                         customBackground: previewBackground,
@@ -426,35 +423,69 @@ struct SettingsView: View {
             }
 
             Section(L.t("settings.section.appearance")) {
-                Picker(L.t("settings.barStyle"), selection: styleBinding) {
-                    ForEach(BarStyle.allCases, id: \.self) { s in
-                        Text(L.t("style.\(s.rawValue)")).tag(s)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L.t("settings.barStyle")).font(.subheadline).foregroundStyle(.secondary)
+                    HStack(spacing: 6) {
+                        ForEach([BarStyle.solid, .outline, .track, .pill], id: \.self) { s in
+                            Button {
+                                barStyleRaw = s.rawValue
+                            } label: {
+                                Text(L.t("style.\(s.rawValue)"))
+                                    .font(.system(size: 12, weight: .medium))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(barStyleRaw == s.rawValue ? Color.accentColor : Color.secondary.opacity(0.1))
+                                    .foregroundStyle(barStyleRaw == s.rawValue ? .white : .primary)
+                                    .cornerRadius(8)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                 }
-                .pickerStyle(.menu)
-            }
+                .padding(.vertical, 4)
 
-            Section(L.t("settings.section.colors")) {
-                let kind = (BarStyle(rawValue: barStyleRaw) ?? .outline).renderKind
-
-                Toggle(L.t("settings.useCustomTint"), isOn: $useCustomTint)
-                if useCustomTint {
-                    ColorPicker(L.t("settings.color"), selection: colorBinding($tintR, $tintG, $tintB), supportsOpacity: false)
-                }
-
-                if kind == .outline {
-                    Toggle(L.t("settings.useCustomBorder"), isOn: $useCustomBorder)
-                    if useCustomBorder {
-                        ColorPicker(L.t("settings.color"), selection: colorBinding($borderR, $borderG, $borderB), supportsOpacity: false)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L.t("settings.color")).font(.subheadline).foregroundStyle(.secondary)
+                    HStack(spacing: 8) {
+                        ForEach(tintColors, id: \.0) { name, color in
+                            Circle()
+                                .fill(color)
+                                .frame(width: 28, height: 28)
+                                .overlay(
+                                    Circle().stroke(Color.white, lineWidth: 2)
+                                        .opacity(useCustomTint && selectedTintColor == name ? 1 : 0)
+                                )
+                                .shadow(radius: useCustomTint && selectedTintColor == name ? 2 : 0)
+                                .onTapGesture {
+                                    selectedTintColor = name
+                                    useCustomTint = true
+                                    let ns = NSColor(color)
+                                    tintR = Double(ns.redComponent)
+                                    tintG = Double(ns.greenComponent)
+                                    tintB = Double(ns.blueComponent)
+                                }
+                        }
                     }
                 }
+                .padding(.vertical, 4)
 
-                if kind == .track || kind == .pillWithPercent {
-                    Toggle(L.t("settings.useCustomBackground"), isOn: $useCustomBackground)
-                    if useCustomBackground {
-                        ColorPicker(L.t("settings.color"), selection: colorBinding($backgroundR, $backgroundG, $backgroundB), supportsOpacity: false)
-                    }
+                HStack {
+                    Text(L.t("settings.useCustomBackground")).font(.subheadline).foregroundStyle(.secondary)
+                    Spacer()
+                    Slider(value: $backgroundOpacity, in: 0...0.4)
+                        .frame(maxWidth: 120)
+                    Text("\(Int(backgroundOpacity * 100))%").font(.caption).foregroundStyle(.secondary).frame(width: 30, alignment: .trailing)
                 }
+                .padding(.vertical, 4)
+
+                HStack {
+                    Text(L.t("settings.pillWidth")).font(.subheadline).foregroundStyle(.secondary)
+                    Spacer()
+                    Slider(value: $pillWidthFactor, in: 0.3...1.0)
+                        .frame(maxWidth: 120)
+                    Text("\(Int(pillWidthFactor * 100))%").font(.caption).foregroundStyle(.secondary).frame(width: 30, alignment: .trailing)
+                }
+                .padding(.vertical, 4)
             }
 
             Section(L.t("settings.section.percentText")) {
@@ -481,11 +512,6 @@ struct SettingsView: View {
                 HStack {
                     Text(L.t("settings.percentSize"))
                     Slider(value: $percentSize, in: 0.4...0.95)
-                        .frame(maxWidth: 200)
-                }
-                HStack {
-                    Text(L.t("settings.pillWidth"))
-                    Slider(value: $pillWidthFactor, in: 0.3...1.0)
                         .frame(maxWidth: 200)
                 }
             }
@@ -581,6 +607,17 @@ struct SettingsView: View {
         .onChange(of: openOnLogin) { _, newValue in
             LoginItemManager.setEnabled(newValue)
         }
+    }
+
+    private var tintColors: [(String, Color)] {
+        [
+            ("green", Color(red: 0.45, green: 0.75, blue: 0.25)),
+            ("orange", Color(red: 0.9, green: 0.55, blue: 0.2)),
+            ("pink", Color(red: 0.9, green: 0.35, blue: 0.5)),
+            ("blue", Color(red: 0.25, green: 0.5, blue: 0.85)),
+            ("purple", Color(red: 0.55, green: 0.3, blue: 0.75)),
+            ("teal", Color(red: 0.2, green: 0.65, blue: 0.55))
+        ]
     }
 }
 
@@ -1274,7 +1311,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func loadSavedStyle() -> BarStyle {
         guard let raw = UserDefaults.standard.string(forKey: Self.styleKey),
-              let style = BarStyle(rawValue: raw) else { return .outline }
+              let style = BarStyle(rawValue: raw) else { return .solid }
         return style
     }
 
@@ -1373,27 +1410,29 @@ struct DiskUsage {
 // MARK: - BarStyle
 
 enum BarStyle: String, CaseIterable {
-    case outline, track, pillWithPercent
-    case outlineColor, trackColor, pillWithPercentColor
+    case solid, outline, track, pill, pillWithPercent, trackOutline, gradient, minimal
 
-    enum RenderKind { case outline, track, pillWithPercent }
+    enum RenderKind { case solid, outline, track, pill, pillWithPercent, trackOutline, gradient, minimal }
 
     var displayName: String { L.t("style.\(rawValue)") }
 
     var fillColor: NSColor {
         switch self {
-        case .outlineColor, .trackColor, .pillWithPercentColor:
-            return .controlAccentColor
-        default:
-            return .labelColor
+        case .gradient: return .controlAccentColor
+        default: return .labelColor
         }
     }
 
     var renderKind: RenderKind {
         switch self {
-        case .outline, .outlineColor:                 return .outline
-        case .track, .trackColor:                     return .track
-        case .pillWithPercent, .pillWithPercentColor: return .pillWithPercent
+        case .solid:          return .solid
+        case .outline:        return .outline
+        case .track:          return .track
+        case .pill:           return .pill
+        case .pillWithPercent: return .pillWithPercent
+        case .trackOutline:   return .trackOutline
+        case .gradient:       return .gradient
+        case .minimal:        return .minimal
         }
     }
 }
@@ -1668,12 +1707,21 @@ final class StorageBarView: NSView {
         let rect = bounds.insetBy(dx: dxInset, dy: dyInset)
         let radius = rect.height / 2
         let f = CGFloat(max(0, min(1, fraction)))
-        let shape = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius)
         let tint = customTint ?? style.fillColor
         let border = customBorder ?? tint.withAlphaComponent(0.45)
         let background = customBackground ?? NSColor.labelColor.withAlphaComponent(0.18)
 
         switch style.renderKind {
+        case .solid:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barRadius = barAreaRect.height / 2
+            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
+            background.setFill()
+            barShape.fill()
+            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
+
         case .outline:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
@@ -1686,6 +1734,16 @@ final class StorageBarView: NSView {
             clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
 
         case .track:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barRadius = barAreaRect.height / 2
+            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
+            background.setFill()
+            barShape.fill()
+            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
+
+        case .pill:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
             let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
@@ -1731,6 +1789,48 @@ final class StorageBarView: NSView {
                 width: textSize.width, height: textSize.height
             )
             (text as NSString).draw(in: textRect, withAttributes: attrs)
+
+        case .trackOutline:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barRadius = barAreaRect.height / 2
+            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
+            background.setFill()
+            barShape.fill()
+            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
+            border.setStroke()
+            barShape.lineWidth = max(1, h / 28.0)
+            barShape.stroke()
+
+        case .gradient:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barRadius = barAreaRect.height / 2
+            let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
+            background.setFill()
+            barShape.fill()
+            clipFillGradient(shape: barShape, rect: barAreaRect, fraction: f, startColor: NSColor(red: 0.45, green: 0.75, blue: 0.25, alpha: 1), endColor: NSColor(red: 0.9, green: 0.55, blue: 0.2, alpha: 1))
+
+        case .minimal:
+            let barWidthFactor = pillWidthFactor
+            let barAreaWidth = rect.width * barWidthFactor
+            let barAreaRect = NSRect(x: rect.minX, y: rect.midY - 1.5, width: barAreaWidth, height: 3)
+            let trackPath = NSBezierPath()
+            trackPath.move(to: NSPoint(x: barAreaRect.minX, y: barAreaRect.midY))
+            trackPath.line(to: NSPoint(x: barAreaRect.maxX, y: barAreaRect.midY))
+            NSColor.labelColor.withAlphaComponent(0.15).setStroke()
+            trackPath.lineWidth = 3
+            trackPath.stroke()
+            let fillW = max(0, barAreaWidth * Double(f))
+            let fillPath = NSBezierPath()
+            fillPath.move(to: NSPoint(x: barAreaRect.minX, y: barAreaRect.midY))
+            fillPath.line(to: NSPoint(x: barAreaRect.minX + fillW, y: barAreaRect.midY))
+            tint.setStroke()
+            fillPath.lineWidth = 3
+            fillPath.lineCapStyle = .round
+            fillPath.stroke()
         }
     }
 
@@ -1768,5 +1868,15 @@ final class StorageBarView: NSView {
         let radius = rect.height / 2
         color.setFill()
         NSBezierPath(roundedRect: fillRect, xRadius: radius, yRadius: radius).fill()
+    }
+
+    private func clipFillGradient(shape: NSBezierPath, rect: NSRect, fraction: CGFloat, startColor: NSColor, endColor: NSColor) {
+        guard fraction > 0 else { return }
+        let minW = rect.height
+        let w = max(minW, rect.width * fraction)
+        let fillRect = NSRect(x: rect.minX, y: rect.minY, width: w, height: rect.height)
+        let radius = rect.height / 2
+        let gradient = NSGradient(starting: startColor, ending: endColor)
+        gradient?.draw(in: NSBezierPath(roundedRect: fillRect, xRadius: radius, yRadius: radius), angle: 0)
     }
 }

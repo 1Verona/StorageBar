@@ -8,14 +8,14 @@
     <!-- Releases vão aqui em ordem cronológica decrescente. release.sh adiciona automaticamente. -->
     <item>
         <title>Version 1.1</title>
-        <pubDate>Thu, 07 May 2026 14:49:00 +0000</pubDate>
+        <pubDate>Thu, 07 May 2026 15:10:00 +0000</pubDate>
         <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.1/StorageBar.zip"
-                   sparkle:version="6"
+                   sparkle:version="7"
                    sparkle:shortVersionString="1.1"
                    length="8728073"
                    type="application/octet-stream"
-                   sparkle:edSignature="ms9QSpT2GInWz8zT3nEzfPeE8pwQDIrvoemcvDiYHsLOf2uZ0lh3Apz23jsRMEIKsr5LRPpAZPuZyEymcme9Aw==" />
-        <description><![CDATA[Quick Clean feature, new popover UI, Sparkle auto-updates (SUFeedURL fix)]]></description>
+                   sparkle:edSignature="YrvJ2xWNOT0u1PIn46XMOBNJHAaBPp6thaCVyyLCVnLQNDMA7d18aZVujqK4185csozJoH0CWP3vOnPH7nN2AA==" />
+        <description><![CDATA[8 bar styles, redesigned settings UI with color presets, Quick Clean, Sparkle auto-updates]]></description>
     </item>
     <!--
     Exemplo de entry:
