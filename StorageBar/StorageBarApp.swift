@@ -58,6 +58,7 @@ enum L {
             "settings.useCustomTint": "Custom fill color",
             "settings.useCustomBorder": "Custom border color",
             "settings.useCustomBackground": "Custom background color",
+            "settings.useCustomPercentColor": "Custom text color",
             "settings.color": "Color",
             "settings.font": "Font",
             "settings.weight": "Weight",
@@ -143,6 +144,7 @@ enum L {
             "settings.useCustomTint": "Color de relleno personalizado",
             "settings.useCustomBorder": "Color de borde personalizado",
             "settings.useCustomBackground": "Color de fondo personalizado",
+            "settings.useCustomPercentColor": "Color de texto personalizado",
             "settings.color": "Color",
             "settings.font": "Fuente",
             "settings.weight": "Grosor",
@@ -228,6 +230,7 @@ enum L {
             "settings.useCustomTint": "Cor de preenchimento personalizada",
             "settings.useCustomBorder": "Cor de borda personalizada",
             "settings.useCustomBackground": "Cor de fundo personalizada",
+            "settings.useCustomPercentColor": "Cor do texto personalizada",
             "settings.color": "Cor",
             "settings.font": "Fonte",
             "settings.weight": "Espessura",
@@ -322,6 +325,11 @@ struct SettingsView: View {
     @AppStorage("borderG") private var borderG: Double = 0.5
     @AppStorage("borderB") private var borderB: Double = 0.5
 
+    @AppStorage("useCustomPercentColor") private var useCustomPercentColor: Bool = false
+    @AppStorage("percentColorR") private var percentColorR: Double = 1.0
+    @AppStorage("percentColorG") private var percentColorG: Double = 1.0
+    @AppStorage("percentColorB") private var percentColorB: Double = 1.0
+
     @AppStorage("selectedTintColor") private var selectedTintColor: String = "default"
     @AppStorage("backgroundOpacity") private var backgroundOpacity: Double = 0.2
 
@@ -331,7 +339,7 @@ struct SettingsView: View {
     @AppStorage("percentPosition") private var percentPositionRaw: String = PercentPosition.insideFilled.rawValue
     @AppStorage("percentContent") private var percentContentRaw: String = PercentContent.percent.rawValue
     @AppStorage("showPercentText") private var showPercentText: Bool = true
-    @AppStorage("pillWidthFactor") private var pillWidthFactor: Double = 1.0
+    @AppStorage("pillWidthFactor") private var pillWidthFactor: Double = 0.67
     @AppStorage("openOnLogin") private var openOnLogin: Bool = true
 
     @StateObject private var cleaner = StorageCleaner()
@@ -397,19 +405,30 @@ struct SettingsView: View {
     private var previewBackground: NSColor? {
         NSColor.labelColor.withAlphaComponent(backgroundOpacity)
     }
+    private var previewPercentColor: NSColor? {
+        useCustomPercentColor ? NSColor(srgbRed: percentColorR, green: percentColorG, blue: percentColorB, alpha: 1) : nil
+    }
 
     var body: some View {
         let _ = languageRaw
 
         Form {
             Section {
-                HStack {
-                    Spacer()
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.95, green: 0.6, blue: 0.2),
+                            Color(red: 0.9, green: 0.45, blue: 0.15)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                     StorageBarPreview(
                         style: BarStyle(rawValue: barStyleRaw) ?? .solid,
                         customTint: previewTint,
                         customBorder: previewBorder,
                         customBackground: previewBackground,
+                        customPercentColor: previewPercentColor,
                         percentFont: PercentFont(rawValue: percentFontRaw) ?? .system,
                         percentWeight: PercentWeight(rawValue: percentWeightRaw) ?? .heavy,
                         percentSize: percentSize,
@@ -419,24 +438,12 @@ struct SettingsView: View {
                         pillWidthFactor: pillWidthFactor,
                         fraction: 0.62
                     )
+                    .frame(width: 120, height: 22)
+                    .scaleEffect(x: 220.0 / 120.0, y: 80.0 / 22.0, anchor: .center)
                     .frame(width: 220, height: 80)
-                    .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0.95, green: 0.6, blue: 0.2),
-                                        Color(red: 0.9, green: 0.45, blue: 0.15)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                    )
-                    Spacer()
                 }
-                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, minHeight: 110)
+                .listRowInsets(EdgeInsets())
             }
 
             Section(L.t("settings.section.appearance")) {
@@ -506,20 +513,11 @@ struct SettingsView: View {
                 .padding(.vertical, 4)
 
                 HStack {
-                    Text(L.t("settings.useCustomBackground")).font(.subheadline).foregroundStyle(.secondary)
-                    Spacer()
-                    Slider(value: $backgroundOpacity, in: 0...0.4)
-                        .frame(maxWidth: 120)
-                    Text("\(Int(backgroundOpacity * 100))%").font(.caption).foregroundStyle(.secondary).frame(width: 30, alignment: .trailing)
-                }
-                .padding(.vertical, 4)
-
-                HStack {
                     Text(L.t("settings.pillWidth")).font(.subheadline).foregroundStyle(.secondary)
                     Spacer()
-                    Slider(value: $pillWidthFactor, in: 0.3...1.0)
+                    Slider(value: $pillWidthFactor, in: 0.3...0.67)
                         .frame(maxWidth: 120)
-                    Text("\(Int(pillWidthFactor * 100))%").font(.caption).foregroundStyle(.secondary).frame(width: 30, alignment: .trailing)
+                    Text("\(Int((pillWidthFactor - 0.3) / 0.37 * 100))%").font(.caption).foregroundStyle(.secondary).frame(width: 30, alignment: .trailing)
                 }
                 .padding(.vertical, 4)
             }
@@ -551,6 +549,15 @@ struct SettingsView: View {
                         Text(L.t("settings.percentSize"))
                         Slider(value: $percentSize, in: 0.4...0.95)
                             .frame(maxWidth: 200)
+                    }
+                    HStack {
+                        Toggle(L.t("settings.useCustomPercentColor"), isOn: $useCustomPercentColor)
+                        if useCustomPercentColor {
+                            Spacer()
+                            ColorPicker("", selection: colorBinding($percentColorR, $percentColorG, $percentColorB))
+                                .labelsHidden()
+                                .frame(width: 40)
+                        }
                     }
                 }
             }
@@ -886,6 +893,7 @@ struct StorageBarPreview: NSViewRepresentable {
     let customTint: NSColor?
     let customBorder: NSColor?
     let customBackground: NSColor?
+    let customPercentColor: NSColor?
     let percentFont: PercentFont
     let percentWeight: PercentWeight
     let percentSize: Double
@@ -896,7 +904,9 @@ struct StorageBarPreview: NSViewRepresentable {
     let fraction: Double
 
     func makeNSView(context: Context) -> StorageBarView {
-        StorageBarView(frame: NSRect(x: 0, y: 0, width: 220, height: 80))
+        let v = StorageBarView(frame: NSRect(x: 0, y: 0, width: 120, height: 22))
+        v.isPreview = true
+        return v
     }
 
     func updateNSView(_ view: StorageBarView, context: Context) {
@@ -904,6 +914,7 @@ struct StorageBarPreview: NSViewRepresentable {
         view.customTint = customTint
         view.customBorder = customBorder
         view.customBackground = customBackground
+        view.customPercentColor = customPercentColor
         view.percentFont = percentFont
         view.percentWeight = percentWeight
         view.percentSize = percentSize
@@ -911,7 +922,6 @@ struct StorageBarPreview: NSViewRepresentable {
         view.percentContent = percentContent
         view.showPercentText = showPercentText
         view.pillWidthFactor = pillWidthFactor
-        // valores fictícios pro preview de "GB used/free"
         view.usedBytes = 120 * 1_000_000_000
         view.freeBytes = 80 * 1_000_000_000
         view.fraction = fraction
@@ -1163,7 +1173,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        statusItem = NSStatusBar.system.statusItem(withLength: 60)
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
             let view = StorageBarView(
@@ -1174,6 +1184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             view.customTint = loadCustomTint()
             view.customBorder = loadCustomBorder()
             view.customBackground = loadCustomBackground()
+            view.customPercentColor = loadCustomPercentColor()
             view.percentFont = loadPercentFont()
             view.percentWeight = loadPercentWeight()
             view.percentSize = loadPercentSize()
@@ -1205,6 +1216,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         pop.animates = true
         popover = pop
 
+        updateStatusItemWidth()
         refresh()
         Task {
             await cleaner.scanAll()
@@ -1281,6 +1293,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         barView.customTint = loadCustomTint()
         barView.customBorder = loadCustomBorder()
         barView.customBackground = loadCustomBackground()
+        barView.customPercentColor = loadCustomPercentColor()
         barView.percentFont = loadPercentFont()
         barView.percentWeight = loadPercentWeight()
         barView.percentSize = loadPercentSize()
@@ -1288,6 +1301,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         barView.percentContent = loadPercentContent()
         barView.showPercentText = UserDefaults.standard.bool(forKey: "showPercentText")
         barView.pillWidthFactor = loadPillWidthFactor()
+        updateStatusItemWidth()
         let nowLocked = !LicenseManager.shared.isLicensed
         if barView.locked != nowLocked { barView.locked = nowLocked }
         refresh()
@@ -1386,6 +1400,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return NSColor(srgbRed: r, green: g, blue: b, alpha: 1)
     }
 
+    private func loadCustomPercentColor() -> NSColor? {
+        let d = UserDefaults.standard
+        guard d.bool(forKey: "useCustomPercentColor") else { return nil }
+        let r = d.double(forKey: "percentColorR")
+        let g = d.double(forKey: "percentColorG")
+        let b = d.double(forKey: "percentColorB")
+        return NSColor(srgbRed: r, green: g, blue: b, alpha: 1)
+    }
+
     private func loadPercentFont() -> PercentFont {
         let raw = UserDefaults.standard.string(forKey: "percentFont") ?? ""
         return PercentFont(rawValue: raw) ?? .system
@@ -1413,7 +1436,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func loadPillWidthFactor() -> Double {
         let v = UserDefaults.standard.double(forKey: "pillWidthFactor")
-        return v == 0 ? 1.0 : v
+        return min(v == 0 ? 0.67 : v, 0.67)
+    }
+
+    private func updateStatusItemWidth() {
+        let h: CGFloat = 22
+        var totalWidth: CGFloat = 60
+
+        let showText = UserDefaults.standard.bool(forKey: "showPercentText")
+        let posRaw = UserDefaults.standard.string(forKey: "percentPosition") ?? ""
+        if showText, PercentPosition(rawValue: posRaw) == .outside {
+            let fontSize = h * 9.0 / 22.0 * CGFloat(loadPercentSize())
+            let font = loadPercentFont().font(size: fontSize, weight: loadPercentWeight().nsWeight)
+            let textW = ("100%" as NSString).size(withAttributes: [.font: font]).width
+            totalWidth += textW + h * 0.15 * 2
+        }
+
+        statusItem.length = totalWidth
     }
 
     private func refresh() {
@@ -1723,11 +1762,13 @@ enum PercentWeight: String, CaseIterable {
 @MainActor
 final class StorageBarView: NSView {
     var fraction: Double = 0  { didSet { needsDisplay = true } }
+    var isPreview: Bool = false { didSet { needsDisplay = true } }
     var style: BarStyle = .outline { didSet { needsDisplay = true } }
     var locked: Bool = false { didSet { needsDisplay = true } }
     var customTint: NSColor? = nil { didSet { needsDisplay = true } }
     var customBorder: NSColor? = nil { didSet { needsDisplay = true } }
     var customBackground: NSColor? = nil { didSet { needsDisplay = true } }
+    var customPercentColor: NSColor? = nil { didSet { needsDisplay = true } }
     var percentFont: PercentFont = .system { didSet { needsDisplay = true } }
     var percentWeight: PercentWeight = .heavy { didSet { needsDisplay = true } }
     var percentSize: Double = 0.7 { didSet { needsDisplay = true } }
@@ -1748,7 +1789,18 @@ final class StorageBarView: NSView {
             return
         }
 
-        let rect = bounds.insetBy(dx: dxInset, dy: dyInset)
+        var leftPad: CGFloat = 0
+        if showPercentText && percentPosition == .outside {
+            let fontSize = h * 9.0 / 22.0 * percentSize
+            let font = percentFont.font(size: fontSize, weight: percentWeight.nsWeight)
+            leftPad = ("100%" as NSString).size(withAttributes: [.font: font]).width + h * 0.15
+        }
+        let rect = NSRect(
+            x: bounds.minX + dxInset + leftPad,
+            y: bounds.minY + dyInset,
+            width: bounds.width - 2 * dxInset - leftPad,
+            height: bounds.height - 2 * dyInset
+        )
         let radius = rect.height / 2
         let f = CGFloat(max(0, min(1, fraction)))
         let tint = customTint ?? style.fillColor
@@ -1764,7 +1816,14 @@ final class StorageBarView: NSView {
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             background.setFill()
             barShape.fill()
-            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
+            if f > 0 {
+                let fillW = max(barAreaRect.height, barAreaRect.width * Double(f))
+                NSGraphicsContext.current?.saveGraphicsState()
+                barShape.setClip()
+                tint.setFill()
+                NSBezierPath(roundedRect: NSRect(x: barAreaRect.minX, y: barAreaRect.minY, width: fillW, height: barAreaRect.height), xRadius: barRadius, yRadius: barRadius).fill()
+                NSGraphicsContext.current?.restoreGraphicsState()
+            }
             if showPercentText {
                 drawPercentText(in: barAreaRect, height: h, fraction: Double(f))
             }
@@ -1775,10 +1834,18 @@ final class StorageBarView: NSView {
             let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
+            let lineW = max(1.0, h / 22.0)
+            if f > 0 {
+                let fillW = max(barAreaRect.height, barAreaRect.width * Double(f))
+                NSGraphicsContext.current?.saveGraphicsState()
+                barShape.setClip()
+                tint.setFill()
+                NSBezierPath(roundedRect: NSRect(x: barAreaRect.minX, y: barAreaRect.minY, width: fillW, height: barAreaRect.height), xRadius: barRadius, yRadius: barRadius).fill()
+                NSGraphicsContext.current?.restoreGraphicsState()
+            }
             border.setStroke()
-            barShape.lineWidth = max(1, h / 22.0)
+            barShape.lineWidth = lineW
             barShape.stroke()
-            clipFill(shape: barShape, rect: barAreaRect, fraction: f, color: tint)
             if showPercentText {
                 drawPercentText(in: barAreaRect, height: h, fraction: Double(f))
             }
@@ -1794,12 +1861,12 @@ final class StorageBarView: NSView {
 
             let fillHeight = rect.height * 0.55
             let fillY = rect.minY + (rect.height - fillHeight) / 2
-            let fillRect = NSRect(x: rect.minX, y: fillY, width: barAreaWidth, height: fillHeight)
+            let hInset = (rect.height - fillHeight) / 2
+            let trackWidth = barAreaWidth - 2 * hInset
             let fillRadius = fillHeight / 2
-            let fillShape = NSBezierPath(roundedRect: fillRect, xRadius: fillRadius, yRadius: fillRadius)
             let minW = fillHeight
-            let w = max(minW, barAreaWidth * Double(f))
-            let clippedFillRect = NSRect(x: fillRect.minX, y: fillRect.minY, width: w, height: fillHeight)
+            let w = max(minW, trackWidth * Double(f))
+            let clippedFillRect = NSRect(x: rect.minX + hInset, y: fillY, width: w, height: fillHeight)
             tint.setFill()
             NSBezierPath(roundedRect: clippedFillRect, xRadius: fillRadius, yRadius: fillRadius).fill()
 
@@ -1909,13 +1976,22 @@ final class StorageBarView: NSView {
     private func drawPercentText(in barRect: NSRect, height h: CGFloat, fraction: Double) {
         let text = labelText(fraction: fraction)
         let fontSize = h * 9.0 / 22.0 * percentSize
+        let outside = percentPosition == .outside
+        let defaultColor: NSColor = outside ? .labelColor : .white
         let attrs: [NSAttributedString.Key: Any] = [
             .font: percentFont.font(size: fontSize, weight: percentWeight.nsWeight),
-            .foregroundColor: NSColor.white
+            .foregroundColor: customPercentColor ?? defaultColor
         ]
         let textSize = (text as NSString).size(withAttributes: attrs)
+        let textOriginX: CGFloat
+        if outside {
+            textOriginX = barRect.minX - h * 0.15 - textSize.width
+        } else {
+            let filledW = max(barRect.height, barRect.width * fraction)
+            textOriginX = barRect.minX + filledW / 2 - textSize.width / 2
+        }
         let textRect = NSRect(
-            x: barRect.minX + barRect.width / 2 - textSize.width / 2,
+            x: textOriginX,
             y: barRect.midY - textSize.height / 2,
             width: textSize.width, height: textSize.height
         )
@@ -1939,20 +2015,24 @@ final class StorageBarView: NSView {
 
     private func clipFill(shape: NSBezierPath, rect: NSRect, fraction: CGFloat, color: NSColor) {
         guard fraction > 0 else { return }
-        let minW = rect.height
-        let w = max(minW, rect.width * fraction)
-        let fillRect = NSRect(x: rect.minX, y: rect.minY, width: w, height: rect.height)
-        let radius = rect.height / 2
+        let inset = rect.height * 0.15
+        let innerRect = rect.insetBy(dx: inset, dy: 0)
+        let minW = innerRect.height
+        let w = max(minW, innerRect.width * fraction)
+        let fillRect = NSRect(x: innerRect.minX, y: innerRect.minY, width: w, height: innerRect.height)
+        let radius = innerRect.height / 2
         color.setFill()
         NSBezierPath(roundedRect: fillRect, xRadius: radius, yRadius: radius).fill()
     }
 
     private func clipFillGradient(shape: NSBezierPath, rect: NSRect, fraction: CGFloat, startColor: NSColor, endColor: NSColor) {
         guard fraction > 0 else { return }
-        let minW = rect.height
-        let w = max(minW, rect.width * fraction)
-        let fillRect = NSRect(x: rect.minX, y: rect.minY, width: w, height: rect.height)
-        let radius = rect.height / 2
+        let inset = rect.height * 0.15
+        let innerRect = rect.insetBy(dx: inset, dy: 0)
+        let minW = innerRect.height
+        let w = max(minW, innerRect.width * fraction)
+        let fillRect = NSRect(x: innerRect.minX, y: innerRect.minY, width: w, height: innerRect.height)
+        let radius = innerRect.height / 2
         let gradient = NSGradient(starting: startColor, ending: endColor)
         gradient?.draw(in: NSBezierPath(roundedRect: fillRect, xRadius: radius, yRadius: radius), angle: 0)
     }
