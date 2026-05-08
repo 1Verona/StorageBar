@@ -7,6 +7,17 @@
     <language>en</language>
     <!-- Releases vão aqui em ordem cronológica decrescente. release.sh adiciona automaticamente. -->
     <item>
+        <title>Version 1.2</title>
+        <pubDate>Fri, 08 May 2026 12:56:21 +0000</pubDate>
+        <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.2/StorageBar.zip"
+                   sparkle:version="7"
+                   sparkle:shortVersionString="1.2"
+                   length="5391786"
+                   type="application/octet-stream"
+                   sparkle:edSignature="aDcFgbgyvxh+TmPmhJ5NIAZOVFFk0xAyfCn4WMZqsZ+6Fy11DCQDZtl0onu3h/qzmp+VbKoRYJYyi/RSE2UnAw==" />
+        <description><![CDATA[Liquid Glass icon for macOS 26, redesigned DMG installer, centered menu bar widget]]></description>
+    </item>
+    <item>
         <title>Version 1.1</title>
         <pubDate>Thu, 07 May 2026 16:30:00 +0000</pubDate>
         <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.1/StorageBar.zip"

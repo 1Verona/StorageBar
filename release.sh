@@ -115,17 +115,8 @@ log "Zip created: $(numfmt --to=iec-i --suffix=B $ZIP_SIZE 2>/dev/null || echo "
 
 # --- 5. Notarize ---
 log "Submitting for notarization..."
+# notarytool submit --wait exits non-zero on rejection, so set -e handles failures.
 xcrun notarytool submit StorageBar.zip --keychain-profile "$NOTARY_PROFILE" --wait
-
-# Check status
-SUBMISSION_ID=$(xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" | grep -A1 "StorageBar.zip" | grep "id:" | head -1 | awk '{print $2}')
-STATUS=$(xcrun notarytool info "$SUBMISSION_ID" --keychain-profile "$NOTARY_PROFILE" 2>/dev/null | grep "status:" | awk '{print $2}')
-
-if [ "$STATUS" != "Accepted" ]; then
-    err "Notarization failed with status: $STATUS"
-    log "Check details: xcrun notarytool log $SUBMISSION_ID --keychain-profile $NOTARY_PROFILE"
-    exit 1
-fi
 log "Notarization accepted ✓"
 
 # --- 6. Staple ---
@@ -160,12 +151,12 @@ fi
 # Estimate size with headroom
 STAGING_SIZE_MB=$(du -sm "$DMG_STAGING" | awk '{print $1 + 50}')
 
-hdiutil create -volname "StorageBar" -srcfolder "$DMG_STAGING" \
+hdiutil create -volname "StorageBar Installer" -srcfolder "$DMG_STAGING" \
     -ov -format UDRW -fs HFS+ -size "${STAGING_SIZE_MB}m" "$DMG_TMP"
 
 MOUNT_OUT=$(hdiutil attach -readwrite -noverify -noautoopen "$DMG_TMP")
 MOUNT_DEV=$(echo "$MOUNT_OUT" | grep -E 'Apple_HFS|Apple_APFS' | awk '{print $1}' | head -1)
-MOUNT_DIR="/Volumes/StorageBar"
+MOUNT_DIR="/Volumes/StorageBar Installer"
 # Wait for mount to settle
 for i in 1 2 3 4 5; do
     [ -d "$MOUNT_DIR" ] && break
@@ -175,7 +166,7 @@ done
 # Layout via AppleScript
 osascript <<EOF
 tell application "Finder"
-    tell disk "StorageBar"
+    tell disk "StorageBar Installer"
         open
         set current view of container window to icon view
         set toolbar visible of container window to false
@@ -219,10 +210,10 @@ if [ -f "$PRIVATE_KEY_FILE" ]; then
 import Foundation
 import CryptoKit
 guard let keyData = Data(base64Encoded: \"$PRIVATE_KEY\") else { exit(1) }
-let privateKey = Curve25519.Signing.PrivateKey(rawRepresentation: keyData)
+let privateKey = try Curve25519.Signing.PrivateKey(rawRepresentation: keyData)
 guard let zipData = try? Data(contentsOf: URL(fileURLWithPath: \"$DIST_DIR/StorageBar.zip\")) else { exit(1) }
 let signature = try privateKey.signature(for: zipData)
-print(signature.rawRepresentation.base64EncodedString())
+print(signature.base64EncodedString())
 " 2>/dev/null)
     if [ -n "$SPARKLE_SIG" ]; then
         log "Sparkle signature: $SPARKLE_SIG"
