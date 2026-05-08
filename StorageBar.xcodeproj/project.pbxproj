@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		06E96F7D2FAE07AF004D6D9E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 06DC53612FAC080000D9860C /* Sparkle */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		06DC534A2FAC078B00D9860C /* StorageBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StorageBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -18,30 +22,12 @@
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		06DC53602FAC080000D9860C /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.6.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		06DC53612FAC080000D9860C /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 06DC53602FAC080000D9860C /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
-/* End XCSwiftPackageProductDependency section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		06DC53472FAC078B00D9860C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06E96F7D2FAE07AF004D6D9E /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,15 +100,15 @@
 			);
 			mainGroup = 06DC53412FAC078B00D9860C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				06DC53602FAC080000D9860C /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 06DC534B2FAC078B00D9860C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				06DC53492FAC078B00D9860C /* StorageBar */,
-			);
-			packageReferences = (
-				06DC53602FAC080000D9860C /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 		};
 /* End PBXProject section */
@@ -287,8 +273,8 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUPublicEDKey = "XWperj6Z0QRF20RavqQYYWs27DQwF02SyBN8PgSt2r8=";
 				INFOPLIST_KEY_SUFeedURL = "https://github.com/1Verona/StorageBar/releases/download/appcast/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "XWperj6Z0QRF20RavqQYYWs27DQwF02SyBN8PgSt2r8=";
 				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -326,8 +312,8 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUPublicEDKey = "XWperj6Z0QRF20RavqQYYWs27DQwF02SyBN8PgSt2r8=";
 				INFOPLIST_KEY_SUFeedURL = "https://github.com/1Verona/StorageBar/releases/download/appcast/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "XWperj6Z0QRF20RavqQYYWs27DQwF02SyBN8PgSt2r8=";
 				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -368,6 +354,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		06DC53602FAC080000D9860C /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		06DC53612FAC080000D9860C /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06DC53602FAC080000D9860C /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 06DC53422FAC078B00D9860C /* Project object */;
 }

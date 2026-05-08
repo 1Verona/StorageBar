@@ -1811,7 +1811,8 @@ final class StorageBarView: NSView {
         case .solid:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             background.setFill()
@@ -1831,7 +1832,8 @@ final class StorageBarView: NSView {
         case .outline:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             let lineW = max(1.0, h / 22.0)
@@ -1853,7 +1855,8 @@ final class StorageBarView: NSView {
         case .track:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             NSColor(calibratedRed: 0.92, green: 0.88, blue: 0.85, alpha: 1).setFill()
@@ -1866,7 +1869,7 @@ final class StorageBarView: NSView {
             let fillRadius = fillHeight / 2
             let minW = fillHeight
             let w = max(minW, trackWidth * Double(f))
-            let clippedFillRect = NSRect(x: rect.minX + hInset, y: fillY, width: w, height: fillHeight)
+            let clippedFillRect = NSRect(x: barAreaRect.minX + hInset, y: fillY, width: w, height: fillHeight)
             tint.setFill()
             NSBezierPath(roundedRect: clippedFillRect, xRadius: fillRadius, yRadius: fillRadius).fill()
 
@@ -1877,7 +1880,8 @@ final class StorageBarView: NSView {
         case .pillWithPercent:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             background.setFill()
@@ -1915,7 +1919,8 @@ final class StorageBarView: NSView {
         case .trackOutline:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             background.setFill()
@@ -1931,7 +1936,8 @@ final class StorageBarView: NSView {
         case .gradient:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.minY, width: barAreaWidth, height: rect.height)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.minY, width: barAreaWidth, height: rect.height)
             let barRadius = barAreaRect.height / 2
             let barShape = NSBezierPath(roundedRect: barAreaRect, xRadius: barRadius, yRadius: barRadius)
             background.setFill()
@@ -1944,7 +1950,8 @@ final class StorageBarView: NSView {
         case .minimal:
             let barWidthFactor = pillWidthFactor
             let barAreaWidth = rect.width * barWidthFactor
-            let barAreaRect = NSRect(x: rect.minX, y: rect.midY - 1.5, width: barAreaWidth, height: 3)
+            let barAreaX = rect.minX + (rect.width - barAreaWidth) / 2
+            let barAreaRect = NSRect(x: barAreaX, y: rect.midY - 1.5, width: barAreaWidth, height: 3)
             let trackPath = NSBezierPath()
             trackPath.move(to: NSPoint(x: barAreaRect.minX, y: barAreaRect.midY))
             trackPath.line(to: NSPoint(x: barAreaRect.maxX, y: barAreaRect.midY))

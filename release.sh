@@ -140,10 +140,75 @@ rm -rf "$DIST_DIR/StorageBar.app" "$DIST_DIR/StorageBar.zip"
 cp -R "$BUILD_DIR/StorageBar.app" "$DIST_DIR/"
 cp "$BUILD_DIR/StorageBar.zip" "$DIST_DIR/"
 
-# --- 8. Create DMG ---
+# --- 8. Create DMG (with Applications symlink + custom window) ---
 log "Creating DMG..."
-rm -f "$DIST_DIR/StorageBar.dmg"
-hdiutil create -volname "StorageBar" -srcfolder "$DIST_DIR/StorageBar.app" -ov -format UDZO "$DIST_DIR/StorageBar.dmg"
+DMG_STAGING="$BUILD_DIR/dmg-staging"
+DMG_TMP="$BUILD_DIR/StorageBar-tmp.dmg"
+DMG_FINAL="$DIST_DIR/StorageBar.dmg"
+DMG_BG="$(dirname "$0")/dmg-background.png"
+
+rm -rf "$DMG_STAGING" "$DMG_TMP" "$DMG_FINAL"
+mkdir -p "$DMG_STAGING/.background"
+cp -R "$DIST_DIR/StorageBar.app" "$DMG_STAGING/"
+ln -s /Applications "$DMG_STAGING/Applications"
+if [ -f "$DMG_BG" ]; then
+    cp "$DMG_BG" "$DMG_STAGING/.background/background.png"
+else
+    warn "dmg-background.png not found — DMG will use default background"
+fi
+
+# Estimate size with headroom
+STAGING_SIZE_MB=$(du -sm "$DMG_STAGING" | awk '{print $1 + 50}')
+
+hdiutil create -volname "StorageBar" -srcfolder "$DMG_STAGING" \
+    -ov -format UDRW -fs HFS+ -size "${STAGING_SIZE_MB}m" "$DMG_TMP"
+
+MOUNT_OUT=$(hdiutil attach -readwrite -noverify -noautoopen "$DMG_TMP")
+MOUNT_DEV=$(echo "$MOUNT_OUT" | grep -E 'Apple_HFS|Apple_APFS' | awk '{print $1}' | head -1)
+MOUNT_DIR="/Volumes/StorageBar"
+# Wait for mount to settle
+for i in 1 2 3 4 5; do
+    [ -d "$MOUNT_DIR" ] && break
+    sleep 1
+done
+
+# Layout via AppleScript
+osascript <<EOF
+tell application "Finder"
+    tell disk "StorageBar"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set the bounds of container window to {200, 120, 740, 500}
+        set viewOptions to the icon view options of container window
+        set arrangement of viewOptions to not arranged
+        set icon size of viewOptions to 128
+        try
+            set background picture of viewOptions to file ".background:background.png"
+        end try
+        set position of item "StorageBar.app" of container window to {140, 190}
+        set position of item "Applications" of container window to {400, 190}
+        update without registering applications
+        delay 1
+        close
+    end tell
+end tell
+EOF
+
+sync
+hdiutil detach "$MOUNT_DEV" -quiet || hdiutil detach "$MOUNT_DIR" -quiet || true
+hdiutil convert "$DMG_TMP" -format UDZO -imagekey zlib-level=9 -o "$DMG_FINAL"
+rm -f "$DMG_TMP"
+
+# Sign DMG
+codesign --force --sign "Developer ID Application: Aether Tech LTDA. ($TEAM_ID)" --timestamp "$DMG_FINAL"
+log "DMG criado e assinado ✓"
+
+# Notarize DMG
+log "Submitting DMG for notarization..."
+xcrun notarytool submit "$DMG_FINAL" --keychain-profile "$NOTARY_PROFILE" --wait
+xcrun stapler staple "$DMG_FINAL" && log "DMG stapled ✓" || warn "DMG staple failed"
 
 # --- 9. Sign update for Sparkle ---
 log "Signing update for Sparkle..."
