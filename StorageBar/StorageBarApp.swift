@@ -120,6 +120,8 @@ enum L {
             "clean.iosBackups": "iOS Backups",
             "clean.iosBackupWarning": "This will delete all iPhone/iPad backups stored locally. Continue?",
             "clean.dmgFiles": "DMG Installers",
+            "clean.premiereProjects": "Premiere Projects",
+            "clean.afterEffectsProjects": "After Effects Projects",
             "menu.quickClean": "Quick Clean",
             "menu.cleanNow": "Clean Selected",
         ],
@@ -206,6 +208,8 @@ enum L {
             "clean.iosBackups": "Copias de iOS",
             "clean.iosBackupWarning": "Esto eliminará todas las copias de iPhone/iPad almacenadas localmente. ¿Continuar?",
             "clean.dmgFiles": "Instaladores DMG",
+            "clean.premiereProjects": "Proyectos de Premiere",
+            "clean.afterEffectsProjects": "Proyectos de After Effects",
             "menu.quickClean": "Limpieza rápida",
             "menu.cleanNow": "Limpiar seleccionados",
         ],
@@ -292,6 +296,8 @@ enum L {
             "clean.iosBackups": "Backups de iOS",
             "clean.iosBackupWarning": "Isso excluirá todos os backups de iPhone/iPad armazenados localmente. Continuar?",
             "clean.dmgFiles": "Instaladores DMG",
+            "clean.premiereProjects": "Projetos do Premiere",
+            "clean.afterEffectsProjects": "Projetos do After Effects",
             "menu.quickClean": "Limpeza rápida",
             "menu.cleanNow": "Limpar selecionados",
         ],
@@ -1554,7 +1560,7 @@ enum PercentContent: String, CaseIterable {
 // MARK: - StorageCleaner
 
 enum CleanCategory: String, CaseIterable, Identifiable {
-    case emptyTrash, userCaches, logFiles, oldDownloads, screenshots, xcodeDerivedData, browserCaches, iosBackups, dmgFiles
+    case emptyTrash, userCaches, logFiles, oldDownloads, screenshots, xcodeDerivedData, browserCaches, iosBackups, dmgFiles, premiereProjects, afterEffectsProjects
     var id: String { rawValue }
 }
 
@@ -1701,6 +1707,10 @@ final class StorageCleaner: ObservableObject {
             return contents
                 .filter { $0.lowercased().hasSuffix(".dmg") }
                 .map { dlDir + "/" + $0 }
+        case .premiereProjects:
+            return [home + "/Minhas coisas/Edição/Premiere"]
+        case .afterEffectsProjects:
+            return [home + "/Minhas coisas/Edição/After Effects"]
         }
     }
 
