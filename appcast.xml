@@ -7,6 +7,17 @@
     <language>en</language>
     <!-- Releases vão aqui em ordem cronológica decrescente. release.sh adiciona automaticamente. -->
     <item>
+        <title>Version 1.3</title>
+        <pubDate>Mon, 18 May 2026 22:45:00 +0000</pubDate>
+        <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.3/StorageBar.zip"
+                   sparkle:version="8"
+                   sparkle:shortVersionString="1.3"
+                   length="5391127"
+                   type="application/octet-stream"
+                   sparkle:edSignature="QHWJu7Jbvo4C0mb3GudBfdj76jQI0MBBBzSrrriG60Nn3fSlKLQ5FnSV8q7zPtzManeFflBBzkag7yECzNU5CQ==" />
+        <description><![CDATA[Adiciona opções de limpeza para pastas de projetos do Premiere e After Effects na Quick Clean]]></description>
+    </item>
+    <item>
         <title>Version 1.2</title>
         <pubDate>Fri, 08 May 2026 12:56:21 +0000</pubDate>
         <enclosure url="https://github.com/1Verona/StorageBar/releases/download/v1.2/StorageBar.zip"
